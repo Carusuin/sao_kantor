@@ -251,6 +251,7 @@ $(document).ready(function() {
         const otherTaxRate = 11/12; // 11/12 of tax base
 
         const otherTax = Math.round(taxBase * otherTaxRate);
+        // Calculate VAT based on Tax Base Selling Price (110%)
         const vat = Math.round(taxBase * vatRate);
 
         // Format and display calculated values
