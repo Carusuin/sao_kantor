@@ -39,8 +39,6 @@ Route::middleware('auth')->group(function () {
         // Placeholder for password update logic
         return redirect()->back()->with('success', 'Password berhasil diubah.');
     })->name('password.update');
-
-
     
     Route::prefix('laporan')->name('laporan.')->group(function () {
     // Main CRUD routes
