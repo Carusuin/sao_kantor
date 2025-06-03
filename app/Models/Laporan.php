@@ -86,23 +86,27 @@ class Laporan extends Model
     public function generateXMLContent()
     {
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<DetailInvoiceSales>' . "\n";
+        $xml .= '<RetailInvoiceBulk>' . "\n";
         $xml .= '    <TIN>' . $this->tin . '</TIN>' . "\n";
-        $xml .= '    <TaxPeriodMonth>' . str_pad($this->tax_period_month, 2, '0', STR_PAD_LEFT) . '</TaxPeriodMonth>' . "\n";
+        $xml .= '    <TaxPeriodMonth>' . $this->tax_period_month . '</TaxPeriodMonth>' . "\n";
         $xml .= '    <TaxPeriodYear>' . $this->tax_period_year . '</TaxPeriodYear>' . "\n";
-        $xml .= '    <TrxCode>' . $this->trx_code . '</TrxCode>' . "\n";
-        $xml .= '    <BuyerName>' . $this->buyer_name . '</BuyerName>' . "\n";
-        $xml .= '    <BuyerIdOpt>' . $this->buyer_id_opt . '</BuyerIdOpt>' . "\n";
-        $xml .= '    <BuyerIdNumber>' . $this->buyer_id_number . '</BuyerIdNumber>' . "\n";
-        $xml .= '    <GoodServiceOpt>' . $this->good_service_opt . '</GoodServiceOpt>' . "\n";
-        $xml .= '    <SerialNo>' . $this->serial_no . '</SerialNo>' . "\n";
-        $xml .= '    <TransactionDate>' . $this->transaction_date . '</TransactionDate>' . "\n";
-        $xml .= '    <TaxBaseSellingPrice>' . number_format($this->tax_base_selling_price, 0, '', '') . '</TaxBaseSellingPrice>' . "\n";
-        $xml .= '    <OtherTaxSellingPrice>' . number_format($this->other_tax_selling_price, 0, '', '') . '</OtherTaxSellingPrice>' . "\n";
-        $xml .= '    <VAT>' . number_format($this->vat, 0, '', '') . '</VAT>' . "\n";
-        $xml .= '    <STLG>' . $this->stlg . '</STLG>' . "\n";
-        $xml .= '    <Info>' . $this->info . '</Info>' . "\n";
-        $xml .= '</DetailInvoiceSales>';
+        $xml .= '    <ListOfRetailInvoice>' . "\n";
+        $xml .= '        <RetailInvoice>' . "\n";
+        $xml .= '            <TrxCode>' . $this->trx_code . '</TrxCode>' . "\n";
+        $xml .= '            <BuyerName>' . $this->buyer_name . '</BuyerName>' . "\n";
+        $xml .= '            <BuyerIdOpt>' . $this->buyer_id_opt . '</BuyerIdOpt>' . "\n";
+        $xml .= '            <BuyerIdNumber>' . $this->buyer_id_number . '</BuyerIdNumber>' . "\n";
+        $xml .= '            <GoodServiceOpt>' . $this->good_service_opt . '</GoodServiceOpt>' . "\n";
+        $xml .= '            <SerialNo>' . $this->serial_no . '</SerialNo>' . "\n";
+        $xml .= '            <TransactionDate>' . $this->transaction_date->format('Y-m-d') . '</TransactionDate>' . "\n";
+        $xml .= '            <TaxBaseSellingPrice>' . number_format($this->tax_base_selling_price, 0, '', '') . '</TaxBaseSellingPrice>' . "\n";
+        $xml .= '            <OtherTaxBaseSellingPrice>' . number_format($this->other_tax_selling_price, 0, '', '') . '</OtherTaxBaseSellingPrice>' . "\n";
+        $xml .= '            <VAT>' . number_format($this->vat, 0, '', '') . '</VAT>' . "\n";
+        $xml .= '            <STLG>' . $this->stlg . '</STLG>' . "\n";
+        $xml .= '            <Info>' . $this->info . '</Info>' . "\n";
+        $xml .= '        </RetailInvoice>' . "\n";
+        $xml .= '    </ListOfRetailInvoice>' . "\n";
+        $xml .= '</RetailInvoiceBulk>';
         
         return $xml;
     }

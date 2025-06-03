@@ -1,6 +1,6 @@
 @extends('dashboard_layout')
 
-@section('title', 'Edit Laporan Pajak')
+@section('title', 'Buat Laporan Baru')
 
 @section('content')
 <div class="container-fluid">
@@ -9,56 +9,46 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">
-                        <i class="fas fa-edit me-2"></i>Edit Laporan Pajak
+                        <i class="fas fa-plus me-2"></i>Buat Laporan Pajak Baru
                     </h4>
                 </div>
                 
                 <div class="card-body">
-                    <form action="{{ route('laporan.update', $laporan->id) }}" method="POST" id="editLaporanForm">
+                    <form action="{{ route('laporan.store') }}" method="POST" id="createLaporanForm">
                         @csrf
-                        @method('PUT')
                         
                         <div class="row">
                             <!-- Informasi Dasar Laporan -->
+                            <div class="col-md-12 mb-3">
+                                <label for="tin" class="form-label">TIN</label>
+                                <input type="text" class="form-control @error('tin') is-invalid @enderror" 
+                                       id="tin" name="tin" 
+                                       value="{{ old('tin') }}" 
+                                       placeholder="Masukkan TIN" required>
+                                @error('tin')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="tax_period_month" class="form-label">Periode Bulan Pajak</label>
-                                    <select class="form-select @error('tax_period_month') is-invalid @enderror" 
-                                            id="tax_period_month" name="tax_period_month" required>
-                                        <option value="">Pilih Bulan</option>
-                                        @for($i = 1; $i <= 12; $i++)
-                                            <option value="{{ $i }}" 
-                                                {{ old('tax_period_month', $laporan->tax_period_month) == $i ? 'selected' : '' }}>
-                                                {{ DateTime::createFromFormat('!m', $i)->format('F') }}
-                                            </option>
-                                        @endfor
-                                    </select>
-                                    @error('tax_period_month')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <p class="form-control-static">{{ date('F', mktime(0, 0, 0, $taxPeriodMonth, 1)) }}</p>
+                                    <input type="hidden" name="tax_period_month" value="{{ $taxPeriodMonth }}">
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="tax_period_year" class="form-label">Periode Tahun Pajak</label>
-                                    <select class="form-select @error('tax_period_year') is-invalid @enderror" 
-                                            id="tax_period_year" name="tax_period_year" required>
-                                        <option value="">Pilih Tahun</option>
-                                        @for($year = date('Y'); $year >= 2020; $year--)
-                                            <option value="{{ $year }}" 
-                                                {{ old('tax_period_year', $laporan->tax_period_year) == $year ? 'selected' : '' }}>
-                                                {{ $year }}
-                                            </option>
-                                        @endfor
-                                    </select>
-                                    @error('tax_period_year')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                     <p class="form-control-static">{{ $taxPeriodYear }}</p>
+                                     <input type="hidden" name="tax_period_year" value="{{ $taxPeriodYear }}">
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -66,8 +56,8 @@
                                     <select class="form-select @error('trx_code') is-invalid @enderror" 
                                             id="trx_code" name="trx_code" required>
                                         <option value="">Pilih Kode</option>
-                                        <option value="Normal" {{ old('trx_code', $laporan->trx_code) == 'Normal' ? 'selected' : '' }}>Normal</option>
-                                        <option value="Pembetulan" {{ old('trx_code', $laporan->trx_code) == 'Pembetulan' ? 'selected' : '' }}>Pembetulan</option>
+                                        <option value="Normal" {{ old('trx_code') == 'Normal' ? 'selected' : '' }}>Normal</option>
+                                        <option value="Pembetulan" {{ old('trx_code') == 'Pembetulan' ? 'selected' : '' }}>Pembetulan</option>
                                     </select>
                                     @error('trx_code')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -80,7 +70,7 @@
                                     <label for="buyer_name" class="form-label">Nama Pembeli</label>
                                     <input type="text" class="form-control @error('buyer_name') is-invalid @enderror" 
                                            id="buyer_name" name="buyer_name" 
-                                           value="{{ old('buyer_name', $laporan->buyer_name) }}" 
+                                           value="{{ old('buyer_name', '-') }}" 
                                            placeholder="Masukkan nama pembeli" required>
                                     @error('buyer_name')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -96,9 +86,9 @@
                                     <select class="form-select @error('buyer_id_opt') is-invalid @enderror" 
                                             id="buyer_id_opt" name="buyer_id_opt" required>
                                         <option value="">Pilih Opsi</option>
-                                        <option value="NIK" {{ old('buyer_id_opt', $laporan->buyer_id_opt) == 'NIK' ? 'selected' : '' }}>NIK</option>
-                                        <option value="NPWP" {{ old('buyer_id_opt', $laporan->buyer_id_opt) == 'NPWP' ? 'selected' : '' }}>NPWP</option>
-                                        <option value="Passport" {{ old('buyer_id_opt', $laporan->buyer_id_opt) == 'Passport' ? 'selected' : '' }}>Passport</option>
+                                        <option value="NIK" {{ old('buyer_id_opt', 'NIK') == 'NIK' ? 'selected' : '' }}>NIK</option>
+                                        <option value="NPWP" {{ old('buyer_id_opt', 'NPWP') == 'NPWP' ? 'selected' : '' }}>NPWP</option>
+                                        <option value="Passport" {{ old('buyer_id_opt', 'Passport') == 'Passport' ? 'selected' : '' }}>Passport</option>
                                     </select>
                                     @error('buyer_id_opt')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -111,7 +101,7 @@
                                     <label for="buyer_id_number" class="form-label">Nomor ID Pembeli</label>
                                     <input type="text" class="form-control @error('buyer_id_number') is-invalid @enderror" 
                                            id="buyer_id_number" name="buyer_id_number" 
-                                           value="{{ old('buyer_id_number', $laporan->buyer_id_number) }}" 
+                                           value="{{ old('buyer_id_number', '0000000000000000') }}" 
                                            placeholder="16 digit angka (0 jika kosong)" 
                                            maxlength="16" required>
                                     @error('buyer_id_number')
@@ -128,8 +118,8 @@
                                     <select class="form-select @error('good_service_opt') is-invalid @enderror" 
                                             id="good_service_opt" name="good_service_opt" required>
                                         <option value="">Pilih Opsi</option>
-                                        <option value="A" {{ old('good_service_opt', $laporan->good_service_opt) == 'A' ? 'selected' : '' }}>A - Barang</option>
-                                        <option value="B" {{ old('good_service_opt', $laporan->good_service_opt) == 'B' ? 'selected' : '' }}>B - Jasa</option>
+                                        <option value="A" {{ old('good_service_opt', 'A') == 'A' ? 'selected' : '' }}>A - Barang</option>
+                                        <option value="B" {{ old('good_service_opt', 'B') == 'B' ? 'selected' : '' }}>B - Jasa</option>
                                     </select>
                                     @error('good_service_opt')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -142,7 +132,7 @@
                                     <label for="serial_no" class="form-label">Nomor Seri</label>
                                     <input type="text" class="form-control @error('serial_no') is-invalid @enderror" 
                                            id="serial_no" name="serial_no" 
-                                           value="{{ old('serial_no', $laporan->serial_no) }}" 
+                                           value="{{ old('serial_no', '-') }}" 
                                            placeholder="Masukkan nomor seri" required>
                                     @error('serial_no')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -155,13 +145,8 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="transaction_date" class="form-label">Tanggal Transaksi</label>
-                                    <input type="date" class="form-control @error('transaction_date') is-invalid @enderror" 
-                                           id="transaction_date" name="transaction_date" 
-                                           value="{{ old('transaction_date', $laporan->transaction_date ? $laporan->transaction_date->format('Y-m-d') : '') }}" 
-                                           required>
-                                    @error('transaction_date')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <p class="form-control-static">{{ \Carbon\Carbon::parse($transactionDate)->format('Y-m-d') }}</p>
+                                    <input type="hidden" name="transaction_date" value="{{ \Carbon\Carbon::parse($transactionDate)->format('Y-m-d') }}">
                                 </div>
                             </div>
                             
@@ -172,7 +157,7 @@
                                         <span class="input-group-text">Rp</span>
                                         <input type="number" class="form-control @error('tax_base_selling_price') is-invalid @enderror" 
                                                id="tax_base_selling_price" name="tax_base_selling_price" 
-                                               value="{{ old('tax_base_selling_price', $laporan->tax_base_selling_price) }}" 
+                                               value="{{ old('tax_base_selling_price') }}" 
                                                placeholder="0" step="0.01" required>
                                     </div>
                                     @error('tax_base_selling_price')
@@ -188,14 +173,14 @@
                                     <label for="other_tax_selling_price" class="form-label">Harga Jual Pajak Lainnya</label>
                                     <div class="input-group">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="number" class="form-control @error('other_tax_selling_price') is-invalid @enderror" 
+                                        <input type="number" class="form-control" 
                                                id="other_tax_selling_price" name="other_tax_selling_price" 
-                                               value="{{ old('other_tax_selling_price', $laporan->other_tax_selling_price) }}" 
-                                               placeholder="0" step="0.01">
+                                               value="{{ old('other_tax_selling_price') }}" 
+                                               placeholder="0" step="0.01" readonly>
+                                        <span class="input-group-text">
+                                            <i class="fas fa-calculator" title="Otomatis dihitung"></i>
+                                        </span>
                                     </div>
-                                    @error('other_tax_selling_price')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                             
@@ -204,17 +189,14 @@
                                     <label for="vat" class="form-label">PPN (Pajak Pertambahan Nilai)</label>
                                     <div class="input-group">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="number" class="form-control @error('vat') is-invalid @enderror" 
+                                        <input type="number" class="form-control" 
                                                id="vat" name="vat" 
-                                               value="{{ old('vat', $laporan->vat) }}" 
+                                               value="{{ old('vat') }}" 
                                                placeholder="0" step="0.01" readonly>
                                         <span class="input-group-text">
                                             <i class="fas fa-calculator" title="Otomatis dihitung"></i>
                                         </span>
                                     </div>
-                                    @error('vat')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -226,8 +208,8 @@
                                     <select class="form-select @error('stlg') is-invalid @enderror" 
                                             id="stlg" name="stlg" required>
                                         <option value="">Pilih Status</option>
-                                        <option value="0" {{ old('stlg', $laporan->stlg) == '0' ? 'selected' : '' }}>0 - Normal</option>
-                                        <option value="1" {{ old('stlg', $laporan->stlg) == '1' ? 'selected' : '' }}>1 - Pembatalan</option>
+                                        <option value="0" {{ old('stlg', '0') == '0' ? 'selected' : '' }}>0 - Normal</option>
+                                        <option value="1" {{ old('stlg', '1') == '1' ? 'selected' : '' }}>1 - Pembatalan</option>
                                     </select>
                                     @error('stlg')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -240,7 +222,7 @@
                                     <label for="info" class="form-label">Informasi Tambahan</label>
                                     <input type="text" class="form-control @error('info') is-invalid @enderror" 
                                            id="info" name="info" 
-                                           value="{{ old('info', $laporan->info) }}" 
+                                           value="{{ old('info', 'ok') }}" 
                                            placeholder="ok atau informasi lainnya">
                                     @error('info')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -256,16 +238,13 @@
                                         <a href="{{ route('laporan.index') }}" class="btn btn-secondary">
                                             <i class="fas fa-arrow-left me-2"></i>Kembali
                                         </a>
-                                        <a href="{{ route('laporan.show', $laporan->id) }}" class="btn btn-info">
-                                            <i class="fas fa-eye me-2"></i>Lihat Detail
-                                        </a>
                                     </div>
                                     <div>
                                         <button type="button" class="btn btn-warning" id="calculateVAT">
                                             <i class="fas fa-calculator me-2"></i>Hitung PPN
                                         </button>
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save me-2"></i>Update Laporan
+                                            <i class="fas fa-save me-2"></i>Simpan Laporan
                                         </button>
                                     </div>
                                 </div>
@@ -283,19 +262,19 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Konfirmasi Update</h5>
+                <h5 class="modal-title">Konfirmasi Simpan</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Apakah Anda yakin ingin mengupdate laporan pajak ini?</p>
+                <p>Apakah Anda yakin ingin menyimpan laporan pajak ini?</p>
                 <div class="alert alert-info">
                     <small><i class="fas fa-info-circle me-2"></i>
-                    Pastikan semua data sudah benar sebelum menyimpan perubahan.</small>
+                    Pastikan semua data sudah benar sebelum menyimpan.</small>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary" id="confirmUpdate">Ya, Update</button>
+                <button type="button" class="btn btn-primary" id="confirmSave">Ya, Simpan</button>
             </div>
         </div>
     </div>
@@ -306,29 +285,35 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    // Auto calculate VAT when tax base selling price changes
-    function calculateVAT() {
+    // Auto calculate VAT and Other Tax when tax base selling price changes
+    function calculateTaxes() {
         const taxBase = parseFloat($('#tax_base_selling_price').val()) || 0;
         const vatRate = 0.11; // 11% VAT rate
+        const otherTaxRate = 11/12; // 11/12 of tax base
+
         const vat = Math.round(taxBase * vatRate);
-        $('#vat').val(vat);
+        const otherTax = Math.round(taxBase * otherTaxRate);
+
+        // Format and display calculated values
+        $('#vat').val(vat.toFixed(0)); // Display as integer
+        $('#other_tax_selling_price').val(otherTax.toFixed(0)); // Display as integer
     }
     
-    // Calculate VAT on price input change
-    $('#tax_base_selling_price').on('input', calculateVAT);
+    // Calculate taxes on price input change
+    $('#tax_base_selling_price').on('input', calculateTaxes);
     
-    // Manual VAT calculation button
+    // Manual calculation button
     $('#calculateVAT').click(function() {
-        calculateVAT();
+        calculateTaxes();
         
         // Show toast notification
         const toast = $('<div class="toast position-fixed top-0 end-0 m-3" role="alert">' +
             '<div class="toast-header">' +
                 '<i class="fas fa-calculator text-success me-2"></i>' +
-                '<strong class="me-auto">Perhitungan PPN</strong>' +
+                '<strong class="me-auto">Perhitungan Pajak</strong>' +
                 '<button type="button" class="btn-close" data-bs-dismiss="toast"></button>' +
             '</div>' +
-            '<div class="toast-body">PPN berhasil dihitung otomatis!</div>' +
+            '<div class="toast-body">PPN dan Pajak Lainnya berhasil dihitung otomatis!</div>' +
         '</div>');
         
         $('body').append(toast);
@@ -340,8 +325,8 @@ $(document).ready(function() {
         });
     });
     
-    // Form validation
-    $('#editLaporanForm').on('submit', function(e) {
+    // Form submission with confirmation modal
+    $('#createLaporanForm').on('submit', function(e) {
         e.preventDefault();
         
         // Show confirmation modal
@@ -349,23 +334,23 @@ $(document).ready(function() {
         confirmModal.show();
     });
     
-    // Confirm update
-    $('#confirmUpdate').click(function() {
+    // Confirm save
+    $('#confirmSave').click(function() {
         // Hide modal
         const confirmModal = bootstrap.Modal.getInstance($('#confirmModal')[0]);
         confirmModal.hide();
         
         // Submit form
-        $('#editLaporanForm')[0].submit();
+        $('#createLaporanForm')[0].submit();
     });
     
-    // Auto-format number inputs
-    $('input[type="number"]').on('blur', function() {
-        const value = parseFloat($(this).val());
-        if (!isNaN(value)) {
-            $(this).val(value.toFixed(2));
-        }
-    });
+    // Auto-format number inputs (optional, removed for integer display based on XML)
+    // $('input[type="number"]').on('blur', function() {
+    //     const value = parseFloat($(this).val());
+    //     if (!isNaN(value)) {
+    //         $(this).val(value.toFixed(2));
+    //     }
+    // });
     
     // Validate buyer ID number format
     $('#buyer_id_number').on('input', function() {
@@ -376,23 +361,32 @@ $(document).ready(function() {
         $(this).val(value);
     });
     
-    // Auto-calculate VAT on page load
-    calculateVAT();
+    // Auto-calculate taxes on page load
+    calculateTaxes();
     
     // Real-time form validation feedback
     $('input, select').on('blur', function() {
         const field = $(this);
         const value = field.val().trim();
         
-        if (field.prop('required') && !value) {
+        if (field.prop('required') && !value && field.attr('id') !== 'info') { // Info is not required
             field.addClass('is-invalid');
             if (!field.next('.invalid-feedback').length) {
                 field.after('<div class="invalid-feedback">Field ini wajib diisi.</div>');
+            } else if (field.prop('required') && value) {
+                 field.removeClass('is-invalid');
+                 field.next('.invalid-feedback').remove();
             }
         } else {
             field.removeClass('is-invalid');
             field.next('.invalid-feedback').remove();
         }
+    });
+
+    // Add validation for TIN
+    $('#tin').on('input', function() {
+         let value = $(this).val().replace(/\D/g, ''); // Remove non-digits
+         $(this).val(value);
     });
 });
 </script>
@@ -448,5 +442,15 @@ $(document).ready(function() {
     border: none;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
+
+.form-control-static {
+    display: block;
+    padding-top: calc(0.375rem + 1px);
+    padding-bottom: calc(0.375rem + 1px);
+    margin-bottom: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #212529; /* Match default input text color */
+}
 </style>
-@endpush
+@endpush 

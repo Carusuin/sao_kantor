@@ -23,7 +23,11 @@ class LaporanController extends Controller
      */
     public function create()
     {
-        return view('laporan.create');
+        $taxPeriodMonth = now()->month;
+        $taxPeriodYear = now()->year;
+        $transactionDate = \App\Models\Laporan::getLastDayOfPreviousMonth(); // Use the static method from the Laporan model
+
+        return view('laporan.create', compact('taxPeriodMonth', 'taxPeriodYear', 'transactionDate'));
     }
 
     /**

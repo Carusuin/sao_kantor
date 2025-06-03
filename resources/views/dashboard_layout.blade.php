@@ -53,7 +53,7 @@
         .sidebar-header h4 {
             color: white;
             margin: 0;
-            font-weight: 600;
+            font-weight: 600    ;
         }
 
         .sidebar.collapsed .sidebar-header h4 {
@@ -242,7 +242,7 @@
             </li>
             
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ route('laporan.index') }}" class="nav-link {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
                     <i class="fas fa-file-alt"></i>
                     <span>Laporan</span>
                 </a>
