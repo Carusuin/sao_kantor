@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
-
+use App\Http\Controllers\LaporanController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -39,4 +39,25 @@ Route::middleware('auth')->group(function () {
         // Placeholder for password update logic
         return redirect()->back()->with('success', 'Password berhasil diubah.');
     })->name('password.update');
+
+
+    
+    Route::prefix('laporan')->name('laporan.')->group(function () {
+    // Main CRUD routes
+    Route::get('/', [LaporanController::class, 'index'])->name('index');
+    Route::get('/create', [LaporanController::class, 'create'])->name('create');
+    Route::post('/', [LaporanController::class, 'store'])->name('store');
+    Route::get('/{laporan}', [LaporanController::class, 'show'])->name('show');
+    Route::get('/{laporan}/edit', [LaporanController::class, 'edit'])->name('edit');
+    Route::put('/{laporan}', [LaporanController::class, 'update'])->name('update');
+    Route::delete('/{laporan}', [LaporanController::class, 'destroy'])->name('destroy');
+    
+    // XML Export routes
+    Route::get('/{laporan}/export-xml', [LaporanController::class, 'exportXML'])->name('export.xml');
+    Route::get('/{laporan}/preview-xml', [LaporanController::class, 'previewXML'])->name('preview.xml');
+    
+    // AJAX routes
+    Route::post('/generate', [LaporanController::class, 'generateLaporan'])->name('generate');
 });
+});
+

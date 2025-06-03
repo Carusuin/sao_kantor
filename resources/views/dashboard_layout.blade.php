@@ -242,7 +242,7 @@
             </li>
             
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ route('laporan') }}" class="nav-link">
                     <i class="fas fa-file-alt"></i>
                     <span>Laporan</span>
                 </a>
