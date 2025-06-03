@@ -247,11 +247,11 @@ $(document).ready(function() {
     // Auto calculate VAT and Other Tax when tax base selling price changes
     function calculateTaxes() {
         const taxBase = parseFloat($('#tax_base_selling_price').val()) || 0;
-        const vatRate = 0.12; // 12% VAT rate based on Other Tax Selling Price
+        const vatRate = 1.10; // 110% VAT rate based on Tax Base Selling Price
         const otherTaxRate = 11/12; // 11/12 of tax base
 
         const otherTax = Math.round(taxBase * otherTaxRate);
-        const vat = Math.round(otherTax * vatRate);
+        const vat = Math.round(taxBase * vatRate);
 
         // Format and display calculated values
         $('#vat').val(vat.toFixed(0)); // Display as integer

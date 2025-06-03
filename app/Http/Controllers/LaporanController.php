@@ -51,17 +51,17 @@ class LaporanController extends Controller
         
         // Set fixed values
         $laporan->tin = $request->tin;
-        $laporan->tax_period_month = now()->month;
-        $laporan->tax_period_year = now()->year;
-        $laporan->trx_code = 'Normal';
-        $laporan->buyer_name = '-';
-        $laporan->buyer_id_opt = 'NIK';
-        $laporan->buyer_id_number = '0000000000000000'; // 16 digits of zero
-        $laporan->good_service_opt = 'A';
-        $laporan->serial_no = '-';
-        $laporan->transaction_date = Laporan::getLastDayOfPreviousMonth();
-        $laporan->stlg = '0';
-        $laporan->info = 'ok';
+        $laporan->tax_period_month = $request->tax_period_month;
+        $laporan->tax_period_year = $request->tax_period_year;
+        $laporan->trx_code = $request->trx_code;
+        $laporan->buyer_name = $request->buyer_name;
+        $laporan->buyer_id_opt = $request->buyer_id_opt;
+        $laporan->buyer_id_number = $request->buyer_id_number;
+        $laporan->good_service_opt = $request->good_service_opt;
+        $laporan->serial_no = $request->serial_no;
+        $laporan->transaction_date = $request->transaction_date;
+        $laporan->stlg = $request->stlg;
+        $laporan->info = $request->info;
         
         // Set input values
         $laporan->tax_base_selling_price = $request->tax_base_selling_price;
