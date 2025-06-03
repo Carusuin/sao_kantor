@@ -23,8 +23,9 @@ class LaporanController extends Controller
      */
     public function create()
     {
-        $taxPeriodMonth = now()->month;
-        $taxPeriodYear = now()->year;
+        $previousMonth = now()->subMonth();
+        $taxPeriodMonth = $previousMonth->month;
+        $taxPeriodYear = $previousMonth->year;
         $transactionDate = \App\Models\Laporan::getLastDayOfPreviousMonth(); // Use the static method from the Laporan model
 
         return view('laporan.create', compact('taxPeriodMonth', 'taxPeriodYear', 'transactionDate'));
@@ -143,7 +144,10 @@ class LaporanController extends Controller
      */
     public function exportXML(Laporan $laporan)
     {
-        $filename = 'laporan_' . $laporan->id . '_' . date('Y-m-d') . '.xml';
+        $tin = $laporan->tin;
+        $month = str_pad($laporan->tax_period_month, 2, '0', STR_PAD_LEFT); // Format month with leading zero
+        $year = $laporan->tax_period_year;
+        $filename = $tin . '_DIGUNGGUNG_' . $month . '_' . $year . '.xml';
         
         return Response::make($laporan->xml_content, 200, [
             'Content-Type' => 'application/xml',

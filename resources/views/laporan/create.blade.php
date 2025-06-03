@@ -53,28 +53,18 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="trx_code" class="form-label">Kode Transaksi</label>
-                                    <select class="form-select @error('trx_code') is-invalid @enderror" 
-                                            id="trx_code" name="trx_code" required>
-                                        <option value="">Pilih Kode</option>
-                                        <option value="Normal" {{ old('trx_code') == 'Normal' ? 'selected' : '' }}>Normal</option>
-                                        <option value="Pembetulan" {{ old('trx_code') == 'Pembetulan' ? 'selected' : '' }}>Pembetulan</option>
-                                    </select>
-                                    @error('trx_code')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <p class="form-control-static">Normal</p>
+                                    <input type="hidden" name="trx_code" value="Normal">
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="buyer_name" class="form-label">Nama Pembeli</label>
-                                    <input type="text" class="form-control @error('buyer_name') is-invalid @enderror" 
+                                    <input type="text" class="form-control" 
                                            id="buyer_name" name="buyer_name" 
-                                           value="{{ old('buyer_name', '-') }}" 
-                                           placeholder="Masukkan nama pembeli" required>
-                                    @error('buyer_name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                           value="-" 
+                                           placeholder="-" readonly>
                                 </div>
                             </div>
                         </div>
@@ -83,30 +73,19 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="buyer_id_opt" class="form-label">Opsi ID Pembeli</label>
-                                    <select class="form-select @error('buyer_id_opt') is-invalid @enderror" 
-                                            id="buyer_id_opt" name="buyer_id_opt" required>
-                                        <option value="">Pilih Opsi</option>
-                                        <option value="NIK" {{ old('buyer_id_opt', 'NIK') == 'NIK' ? 'selected' : '' }}>NIK</option>
-                                        <option value="NPWP" {{ old('buyer_id_opt', 'NPWP') == 'NPWP' ? 'selected' : '' }}>NPWP</option>
-                                        <option value="Passport" {{ old('buyer_id_opt', 'Passport') == 'Passport' ? 'selected' : '' }}>Passport</option>
-                                    </select>
-                                    @error('buyer_id_opt')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <p class="form-control-static">NIK</p>
+                                    <input type="hidden" name="buyer_id_opt" value="NIK">
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="buyer_id_number" class="form-label">Nomor ID Pembeli</label>
-                                    <input type="text" class="form-control @error('buyer_id_number') is-invalid @enderror" 
+                                    <input type="text" class="form-control" 
                                            id="buyer_id_number" name="buyer_id_number" 
-                                           value="{{ old('buyer_id_number', '0000000000000000') }}" 
-                                           placeholder="16 digit angka (0 jika kosong)" 
-                                           maxlength="16" required>
-                                    @error('buyer_id_number')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                           value="0000000000000000" 
+                                           placeholder="0000000000000000" 
+                                           maxlength="16" readonly>
                                 </div>
                             </div>
                         </div>
@@ -115,28 +94,18 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="good_service_opt" class="form-label">Opsi Barang/Jasa</label>
-                                    <select class="form-select @error('good_service_opt') is-invalid @enderror" 
-                                            id="good_service_opt" name="good_service_opt" required>
-                                        <option value="">Pilih Opsi</option>
-                                        <option value="A" {{ old('good_service_opt', 'A') == 'A' ? 'selected' : '' }}>A - Barang</option>
-                                        <option value="B" {{ old('good_service_opt', 'B') == 'B' ? 'selected' : '' }}>B - Jasa</option>
-                                    </select>
-                                    @error('good_service_opt')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <p class="form-control-static">A - Barang</p>
+                                    <input type="hidden" name="good_service_opt" value="A">
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="serial_no" class="form-label">Nomor Seri</label>
-                                    <input type="text" class="form-control @error('serial_no') is-invalid @enderror" 
+                                    <input type="text" class="form-control" 
                                            id="serial_no" name="serial_no" 
-                                           value="{{ old('serial_no', '-') }}" 
-                                           placeholder="Masukkan nomor seri" required>
-                                    @error('serial_no')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                           value="-" 
+                                           placeholder="-" readonly>
                                 </div>
                             </div>
                         </div>
@@ -205,28 +174,18 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="stlg" class="form-label">STLG (Status)</label>
-                                    <select class="form-select @error('stlg') is-invalid @enderror" 
-                                            id="stlg" name="stlg" required>
-                                        <option value="">Pilih Status</option>
-                                        <option value="0" {{ old('stlg', '0') == '0' ? 'selected' : '' }}>0 - Normal</option>
-                                        <option value="1" {{ old('stlg', '1') == '1' ? 'selected' : '' }}>1 - Pembatalan</option>
-                                    </select>
-                                    @error('stlg')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <p class="form-control-static">0 - Normal</p>
+                                    <input type="hidden" name="stlg" value="0">
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="info" class="form-label">Informasi Tambahan</label>
-                                    <input type="text" class="form-control @error('info') is-invalid @enderror" 
+                                    <input type="text" class="form-control" 
                                            id="info" name="info" 
-                                           value="{{ old('info', 'ok') }}" 
-                                           placeholder="ok atau informasi lainnya">
-                                    @error('info')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                           value="ok" 
+                                           placeholder="ok" readonly>
                                 </div>
                             </div>
                         </div>
@@ -288,11 +247,11 @@ $(document).ready(function() {
     // Auto calculate VAT and Other Tax when tax base selling price changes
     function calculateTaxes() {
         const taxBase = parseFloat($('#tax_base_selling_price').val()) || 0;
-        const vatRate = 0.11; // 11% VAT rate
+        const vatRate = 0.12; // 12% VAT rate based on Other Tax Selling Price
         const otherTaxRate = 11/12; // 11/12 of tax base
 
-        const vat = Math.round(taxBase * vatRate);
         const otherTax = Math.round(taxBase * otherTaxRate);
+        const vat = Math.round(otherTax * vatRate);
 
         // Format and display calculated values
         $('#vat').val(vat.toFixed(0)); // Display as integer
