@@ -18,7 +18,6 @@
                         @csrf
                         
                         <div class="row">
-                            <!-- Informasi Dasar Laporan -->
                             <div class="col-md-12 mb-3">
                                 <label for="tin" class="form-label">TIN</label>
                                 <input type="text" class="form-control @error('tin') is-invalid @enderror" 
@@ -28,6 +27,9 @@
                                 @error('tin')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <div class="text-warning mt-1" id="tin-warning" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> TIN harus terdiri dari 16 digit.
+                                </div>
                             </div>
                         </div>
 
@@ -49,7 +51,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="row hidden-fields">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="trx_code" class="form-label">Kode Transaksi</label>
@@ -69,7 +71,7 @@
                             </div>
                         </div>
                         
-                        <div class="row">
+                        <div class="row hidden-fields">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="buyer_id_opt" class="form-label">Opsi ID Pembeli</label>
@@ -90,7 +92,7 @@
                             </div>
                         </div>
                         
-                        <div class="row">
+                        <div class="row hidden-fields">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="good_service_opt" class="form-label">Opsi Barang/Jasa</label>
@@ -170,7 +172,7 @@
                             </div>
                         </div>
                         
-                        <div class="row">
+                        <div class="row hidden-fields">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="stlg" class="form-label">STLG (Status)</label>
@@ -347,6 +349,13 @@ $(document).ready(function() {
     $('#tin').on('input', function() {
          let value = $(this).val().replace(/\D/g, ''); // Remove non-digits
          $(this).val(value);
+         
+         // Check TIN length and show/hide warning
+         if (value.length !== 16 && value.length !== 0) {
+             $('#tin-warning').show();
+         } else {
+             $('#tin-warning').hide();
+         }
     });
 });
 </script>
@@ -411,6 +420,10 @@ $(document).ready(function() {
     font-size: 1rem;
     line-height: 1.5;
     color: #212529; /* Match default input text color */
+}
+
+.hidden-fields {
+    display: none;
 }
 </style>
 @endpush 

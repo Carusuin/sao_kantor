@@ -37,7 +37,7 @@ class LaporanController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'tin' => 'required|string|max:20',
+            'tin' => 'required|string|size:16',
             'tax_base_selling_price' => 'required|numeric|min:0'
         ]);
 
