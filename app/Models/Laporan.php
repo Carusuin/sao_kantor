@@ -49,11 +49,11 @@ class Laporan extends Model
 
     /**
      * Calculate VAT
-     * Formula: round(TaxBaseSellingPrice * 1.10)
+     * Formula: round(TaxBaseSellingPrice * 0.11)
      */
     public function calculateVAT($taxBaseSellingPrice)
     {
-        $result = $taxBaseSellingPrice * 1.10;
+        $result = $taxBaseSellingPrice * 0.11;
         return $this->customRound($result);
     }
 
