@@ -244,14 +244,14 @@
             <li class="nav-item">
                 <a href="{{ route('laporan.index') }}" class="nav-link {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
                     <i class="fas fa-file-alt"></i>
-                    <span>Laporan</span>
+                    <span>Laporan Faktur Digunggung</span>
                 </a>
             </li>
             
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fas fa-calendar-alt"></i>
-                    <span>Jadwal</span>
+                    <span>Laporan Faktur</span>
                 </a>
             </li>
             
