@@ -12,7 +12,7 @@
                         <i class="fas fa-file-alt mr-2"></i>
                         Daftar Laporan
                     </h3>
-                    <a href="{{ route('laporan.create') }}" class="btn btn-warning">
+                    <a href="{{ route('laporan.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus mr-1"></i>
                         Tambah Laporan
                     </a>
