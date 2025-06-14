@@ -9,14 +9,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
-class BarangJasaController extends Controller
+class LaporanFakturController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request): JsonResponse
     {
-        $query = BarangJasa::query();
+        $query = LaporanFaktur::query();
 
         // Filter berdasarkan dokumen_id
         if ($request->has('dokumen_id') && $request->dokumen_id) {
@@ -67,7 +67,7 @@ class BarangJasaController extends Controller
             ], 422);
         }
 
-        $barangJasa = BarangJasa::create($request->validated());
+        $barangJasa = LaporanFaktur::create($request->validated());
 
         return response()->json([
             'status' => 'success',
@@ -79,17 +79,17 @@ class BarangJasaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(BarangJasa $barangJasa): JsonResponse
+    public function show(LaporanFaktur $laporanFaktur): JsonResponse
     {
         return response()->json([
             'status' => 'success',
-            'data' => $barangJasa,
+            'data' => $laporanFaktur,
             'calculated' => [
-                'total' => $barangJasa->calculateTotal(),
-                'formatted_harga' => $barangJasa->formatted_harga_satuan,
-                'formatted_dpp' => $barangJasa->formatted_dpp,
-                'formatted_ppn' => $barangJasa->formatted_ppn,
-                'jenis_text' => $barangJasa->jenis_barang_jasa_text
+                'total' => $laporanFaktur->calculateTotal(),
+                'formatted_harga' => $laporanFaktur->formatted_harga_satuan,
+                'formatted_dpp' => $laporanFaktur->formatted_dpp,
+                'formatted_ppn' => $laporanFaktur->formatted_ppn,
+                'jenis_text' => $laporanFaktur->jenis_barang_jasa_text
             ]
         ]);
     }
@@ -97,9 +97,9 @@ class BarangJasaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, BarangJasa $barangJasa): JsonResponse
+    public function update(Request $request, LaporanFaktur $laporanFaktur): JsonResponse
     {
-        $validator = $this->validateBarangJasa($request, $barangJasa->id);
+        $validator = $this->validateBarangJasa($request, $laporanFaktur->id);
 
         if ($validator->fails()) {
             return response()->json([
@@ -109,11 +109,11 @@ class BarangJasaController extends Controller
             ], 422);
         }
 
-        $barangJasa->update($request->validated());
+        $laporanFaktur->update($request->validated());
 
         return response()->json([
             'status' => 'success',
-            'data' => $barangJasa,
+            'data' => $laporanFaktur,
             'message' => 'Data barang/jasa berhasil diperbarui'
         ]);
     }
@@ -121,9 +121,9 @@ class BarangJasaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(BarangJasa $barangJasa): JsonResponse
+    public function destroy(LaporanFaktur $laporanFaktur): JsonResponse
     {
-        $barangJasa->delete();
+        $laporanFaktur->delete();
 
         return response()->json([
             'status' => 'success',
@@ -140,7 +140,7 @@ class BarangJasaController extends Controller
             'dokumen_id' => 'required|integer'
         ]);
 
-        $deleted = BarangJasa::where('dokumen_id', $request->dokumen_id)->delete();
+        $deleted = LaporanFaktur::where('dokumen_id', $request->dokumen_id)->delete();
 
         return response()->json([
             'status' => 'success',
@@ -158,7 +158,7 @@ class BarangJasaController extends Controller
             'dokumen_id' => 'required|integer'
         ]);
 
-        $items = BarangJasa::byDokumen($request->dokumen_id)->get();
+        $items = LaporanFaktur::byDokumen($request->dokumen_id)->get();
 
         $summary = [
             'total_items' => $items->count(),
