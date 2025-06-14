@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\LaporanFakturController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -56,6 +57,26 @@ Route::middleware('auth')->group(function () {
     
     // AJAX routes
     Route::post('/generate', [LaporanController::class, 'generateLaporan'])->name('generate');
-});
-});
+    
 
+    Route::prefix('laporan_faktur')->name('laporan_faktur.')->group(function () {
+    // Main CRUD routes
+    Route::get('/', [LaporanFakturController::class, 'index'])->name('index');
+    Route::get('/create', [LaporanFakturController::class, 'create'])->name('create');
+    Route::post('/', [LaporanFakturController::class, 'store'])->name('store');
+    Route::get('/{laporan}', [LaporanFakturController::class, 'show'])->name('show');
+    Route::get('/{laporan}/edit', [LaporanFakturController::class, 'edit'])->name('edit');
+    Route::put('/{laporan}', [LaporanFakturController::class, 'update'])->name('update');
+    Route::delete('/{laporan}', [LaporanFakturController::class, 'destroy'])->name('destroy');
+    
+    // XML Export routes
+    Route::get('/{laporan}/export-xml', [LaporanFakturController::class, 'exportXML'])->name('export.xml');
+    Route::get('/{laporan}/preview-xml', [LaporanFakturController::class, 'previewXML'])->name('preview.xml');
+    
+    // AJAX routes
+    Route::post('/generate', [LaporanFakturController::class, 'generateLaporan'])->name('generate');
+
+    
+});
+});
+});
