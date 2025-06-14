@@ -253,7 +253,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('laporanfaktur.index') }}"
+                <a href="{{ route('laporan_faktur.index') }}"
                     class="nav-link {{ request()->routeIs('laporanfaktur.*') ? 'active' : '' }}">
                     <i class="fas fa-file-invoice"></i>
                     <span>Laporan E-Faktur</span>

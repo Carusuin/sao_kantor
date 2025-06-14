@@ -2,201 +2,267 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Laporan;
+use App\Models\BarangJasa;
+use App\Models\LaporanFaktur;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
-class LaporanFakturController extends Controller
+class BarangJasaController extends Controller
 {
     /**
-     * Display laporan index page
+     * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        $laporans = Laporan::orderBy('created_at', 'desc')->paginate(10);
-        return view('laporan.index', compact('laporans'));
-    }
+        $query = BarangJasa::query();
 
-    /**
-     * Show form for creating new laporan
-     */
-    public function create()
-    {
-        $previousMonth = now()->subMonth();
-        $taxPeriodMonth = $previousMonth->month;
-        $taxPeriodYear = $previousMonth->year;
-        $transactionDate = \App\Models\Laporan::getLastDayOfPreviousMonth(); // Use the static method from the Laporan model
-
-        return view('laporan.create', compact('taxPeriodMonth', 'taxPeriodYear', 'transactionDate'));
-    }
-
-    /**
-     * Store new laporan
-     */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'tin' => 'required|string|size:16',
-            'tax_base_selling_price' => 'required|numeric|min:0'
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+        // Filter berdasarkan dokumen_id
+        if ($request->has('dokumen_id') && $request->dokumen_id) {
+            $query->byDokumen($request->dokumen_id);
         }
 
-        $laporan = new Laporan();
-        
-        // Set fixed values
-        $laporan->tin = $request->tin;
-        $laporan->tax_period_month = $request->tax_period_month;
-        $laporan->tax_period_year = $request->tax_period_year;
-        $laporan->trx_code = $request->trx_code;
-        $laporan->buyer_name = $request->buyer_name;
-        $laporan->buyer_id_opt = $request->buyer_id_opt;
-        $laporan->buyer_id_number = $request->buyer_id_number;
-        $laporan->good_service_opt = $request->good_service_opt;
-        $laporan->serial_no = $request->serial_no;
-        $laporan->transaction_date = $request->transaction_date;
-        $laporan->stlg = $request->stlg;
-        $laporan->info = $request->info;
-        
-        // Set input values
-        $laporan->tax_base_selling_price = $request->tax_base_selling_price;
-        
-        // Calculate derived values
-        $laporan->other_tax_selling_price = $laporan->calculateOtherTaxSellingPrice($request->tax_base_selling_price);
-        $laporan->vat = $laporan->calculateVAT($request->tax_base_selling_price);
-        
-        // Generate XML content
-        $laporan->xml_content = $laporan->generateXMLContent();
-        
-        $laporan->save();
-
-        return redirect()->route('laporan.index')
-            ->with('success', 'Laporan berhasil dibuat!');
-    }
-
-    /**
-     * Show specific laporan
-     */
-    public function show(Laporan $laporan)
-    {
-        return view('laporan.show', compact('laporan'));
-    }
-
-    /**
-     * Show form for editing laporan
-     */
-    public function edit(Laporan $laporan)
-    {
-        return view('laporan.edit', compact('laporan'));
-    }
-
-    /**
-     * Update laporan
-     */
-    public function update(Request $request, Laporan $laporan)
-    {
-        $validator = Validator::make($request->all(), [
-            'tin' => 'required|string|max:20',
-            'tax_base_selling_price' => 'required|numeric|min:0'
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+        // Filter berdasarkan jenis barang/jasa
+        if ($request->has('jenis') && in_array($request->jenis, ['B', 'J'])) {
+            $query->where('jenis_barang_jasa', $request->jenis);
         }
 
-        // Update values
-        $laporan->tin = $request->tin;
-        $laporan->tax_base_selling_price = $request->tax_base_selling_price;
-        
-        // Recalculate derived values
-        $laporan->other_tax_selling_price = $laporan->calculateOtherTaxSellingPrice($request->tax_base_selling_price);
-        $laporan->vat = $laporan->calculateVAT($request->tax_base_selling_price);
-        
-        // Regenerate XML content
-        $laporan->xml_content = $laporan->generateXMLContent();
-        
-        $laporan->save();
+        // Filter berdasarkan nama barang/jasa
+        if ($request->has('search') && $request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_barang_jasa', 'like', '%' . $request->search . '%')
+                  ->orWhere('kode_barang_jasa', 'like', '%' . $request->search . '%');
+            });
+        }
 
-        return redirect()->route('laporan.index')
-            ->with('success', 'Laporan berhasil diupdate!');
-    }
+        // Sorting
+        $sortBy = $request->get('sort_by', 'baris');
+        $sortOrder = $request->get('sort_order', 'asc');
+        $query->orderBy($sortBy, $sortOrder);
 
-    /**
-     * Delete laporan
-     */
-    public function destroy(Laporan $laporan)
-    {
-        $laporan->delete();
-        
-        return redirect()->route('laporan.index')
-            ->with('success', 'Laporan berhasil dihapus!');
-    }
+        // Pagination
+        $perPage = $request->get('per_page', 15);
+        $barangJasa = $query->paginate($perPage);
 
-    /**
-     * Export XML file
-     */
-    public function exportXML(Laporan $laporan)
-    {
-        $tin = $laporan->tin;
-        $month = str_pad($laporan->tax_period_month, 2, '0', STR_PAD_LEFT); // Format month with leading zero
-        $year = $laporan->tax_period_year;
-        $filename = $tin . '_DIGUNGGUNG_' . $month . '_' . $year . '.xml';
-        
-        return Response::make($laporan->xml_content, 200, [
-            'Content-Type' => 'application/xml',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        return response()->json([
+            'status' => 'success',
+            'data' => $barangJasa,
+            'message' => 'Data barang/jasa berhasil diambil'
         ]);
     }
 
     /**
-     * Preview XML content
+     * Store a newly created resource in storage.
      */
-    public function previewXML(Laporan $laporan)
+    public function store(Request $request): JsonResponse
     {
-        return response($laporan->xml_content)
-            ->header('Content-Type', 'text/xml');
-    }
-
-    /**
-     * Generate laporan with AJAX
-     */
-    public function generateLaporan(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'tin' => 'required|string|max:20',
-            'tax_base_selling_price' => 'required|numeric|min:0'
-        ]);
+        $validator = $this->validateBarangJasa($request);
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
+                'message' => 'Validasi gagal',
                 'errors' => $validator->errors()
-            ]);
+            ], 422);
         }
 
-        $laporan = new Laporan();
-        $laporan->tin = $request->tin;
-        $laporan->tax_base_selling_price = $request->tax_base_selling_price;
-        
-        $otherTaxSellingPrice = $laporan->calculateOtherTaxSellingPrice($request->tax_base_selling_price);
-        $vat = $laporan->calculateVAT($request->tax_base_selling_price);
+        $barangJasa = BarangJasa::create($request->validated());
 
         return response()->json([
-            'success' => true,
-            'data' => [
-                'other_tax_selling_price' => number_format($otherTaxSellingPrice, 0, ',', '.'),
-                'vat' => number_format($vat, 0, ',', '.'),
-                'transaction_date' => Laporan::getLastDayOfPreviousMonth(),
-                'tax_period_month' => now()->month,
-                'tax_period_year' => now()->year
+            'status' => 'success',
+            'data' => $barangJasa,
+            'message' => 'Data barang/jasa berhasil disimpan'
+        ], 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(BarangJasa $barangJasa): JsonResponse
+    {
+        return response()->json([
+            'status' => 'success',
+            'data' => $barangJasa,
+            'calculated' => [
+                'total' => $barangJasa->calculateTotal(),
+                'formatted_harga' => $barangJasa->formatted_harga_satuan,
+                'formatted_dpp' => $barangJasa->formatted_dpp,
+                'formatted_ppn' => $barangJasa->formatted_ppn,
+                'jenis_text' => $barangJasa->jenis_barang_jasa_text
             ]
         ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, BarangJasa $barangJasa): JsonResponse
+    {
+        $validator = $this->validateBarangJasa($request, $barangJasa->id);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $barangJasa->update($request->validated());
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $barangJasa,
+            'message' => 'Data barang/jasa berhasil diperbarui'
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(BarangJasa $barangJasa): JsonResponse
+    {
+        $barangJasa->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data barang/jasa berhasil dihapus'
+        ]);
+    }
+
+    /**
+     * Bulk delete barang/jasa by dokumen_id
+     */
+    public function bulkDeleteByDokumen(Request $request): JsonResponse
+    {
+        $request->validate([
+            'dokumen_id' => 'required|integer'
+        ]);
+
+        $deleted = BarangJasa::where('dokumen_id', $request->dokumen_id)->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "Berhasil menghapus {$deleted} item barang/jasa",
+            'deleted_count' => $deleted
+        ]);
+    }
+
+    /**
+     * Get summary by dokumen_id
+     */
+    public function getSummaryByDokumen(Request $request): JsonResponse
+    {
+        $request->validate([
+            'dokumen_id' => 'required|integer'
+        ]);
+
+        $items = BarangJasa::byDokumen($request->dokumen_id)->get();
+
+        $summary = [
+            'total_items' => $items->count(),
+            'total_barang' => $items->where('jenis_barang_jasa', 'B')->count(),
+            'total_jasa' => $items->where('jenis_barang_jasa', 'J')->count(),
+            'total_dpp' => $items->sum('dpp'),
+            'total_ppn' => $items->sum('ppn'),
+            'total_ppnbm' => $items->sum('ppnbm'),
+            'grand_total' => $items->sum(function ($item) {
+                return $item->calculateTotal();
+            })
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $summary
+        ]);
+    }
+
+    /**
+     * Generate XML for e-Faktur
+     */
+    public function generateXml(Request $request): JsonResponse
+    {
+        $request->validate([
+            'dokumen_id' => 'required|integer'
+        ]);
+
+        $items = LaporanFaktur::byDokumen($request->dokumen_id)
+                          ->orderBy('baris')
+                          ->get();
+
+        if ($items->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Tidak ada data barang/jasa untuk dokumen ini'
+            ], 404);
+        }
+
+        $xml = $this->generateEFakturXml($items);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'xml_content' => $xml,
+                'total_items' => $items->count()
+            ],
+            'message' => 'XML e-Faktur berhasil dibuat'
+        ]);
+    }
+
+    /**
+     * Validation rules
+     */
+    private function validateBarangJasa(Request $request, $id = null)
+    {
+        return Validator::make($request->all(), [
+            'baris' => 'required|integer|min:1',
+            'jenis_barang_jasa' => 'required|in:B,J',
+            'kode_barang_jasa' => 'required|string|max:50',
+            'nama_barang_jasa' => 'required|string|max:255',
+            'nama_satuan_ukur' => 'required|string|max:50',
+            'harga_satuan' => 'required|numeric|min:0',
+            'jumlah_barang_jasa' => 'required|numeric|min:0',
+            'total_diskon' => 'nullable|numeric|min:0',
+            'dpp' => 'nullable|numeric|min:0',
+            'dpp_nilai_lain' => 'nullable|numeric|min:0',
+            'tarif_ppn' => 'required|numeric|min:0|max:100',
+            'ppn' => 'nullable|numeric|min:0',
+            'tarif_ppnbm' => 'nullable|numeric|min:0|max:100',
+            'ppnbm' => 'nullable|numeric|min:0',
+            'dokumen_id' => 'nullable|integer'
+        ]);
+    }
+
+    /**
+     * Generate e-Faktur XML format
+     */
+    private function generateEFakturXml($items)
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<BARANG_JASA>' . "\n";
+
+        foreach ($items as $item) {
+            $xml .= '  <ITEM>' . "\n";
+            $xml .= '    <BARIS>' . $item->baris . '</BARIS>' . "\n";
+            $xml .= '    <JENIS_BARANG_JASA>' . $item->jenis_barang_jasa . '</JENIS_BARANG_JASA>' . "\n";
+            $xml .= '    <KODE_BARANG_JASA>' . htmlspecialchars($item->kode_barang_jasa) . '</KODE_BARANG_JASA>' . "\n";
+            $xml .= '    <NAMA_BARANG_JASA>' . htmlspecialchars($item->nama_barang_jasa) . '</NAMA_BARANG_JASA>' . "\n";
+            $xml .= '    <NAMA_SATUAN_UKUR>' . htmlspecialchars($item->nama_satuan_ukur) . '</NAMA_SATUAN_UKUR>' . "\n";
+            $xml .= '    <HARGA_SATUAN>' . number_format($item->harga_satuan, 2, '.', '') . '</HARGA_SATUAN>' . "\n";
+            $xml .= '    <JUMLAH_BARANG_JASA>' . number_format($item->jumlah_barang_jasa, 2, '.', '') . '</JUMLAH_BARANG_JASA>' . "\n";
+            $xml .= '    <TOTAL_DISKON>' . number_format($item->total_diskon, 2, '.', '') . '</TOTAL_DISKON>' . "\n";
+            $xml .= '    <DPP>' . number_format($item->dpp, 2, '.', '') . '</DPP>' . "\n";
+            $xml .= '    <DPP_NILAI_LAIN>' . number_format($item->dpp_nilai_lain, 2, '.', '') . '</DPP_NILAI_LAIN>' . "\n";
+            $xml .= '    <TARIF_PPN>' . number_format($item->tarif_ppn, 2, '.', '') . '</TARIF_PPN>' . "\n";
+            $xml .= '    <PPN>' . number_format($item->ppn, 2, '.', '') . '</PPN>' . "\n";
+            $xml .= '    <TARIF_PPNBM>' . number_format($item->tarif_ppnbm, 2, '.', '') . '</TARIF_PPNBM>' . "\n";
+            $xml .= '    <PPNBM>' . number_format($item->ppnbm, 2, '.', '') . '</PPNBM>' . "\n";
+            $xml .= '  </ITEM>' . "\n";
+        }
+
+        $xml .= '</BARANG_JASA>';
+
+        return $xml;
     }
 }
