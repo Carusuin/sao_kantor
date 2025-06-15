@@ -67,6 +67,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/{laporan}/edit', [LaporanFakturController::class, 'edit'])->name('edit');
     Route::put('/{laporan}', [LaporanFakturController::class, 'update'])->name('update');
     Route::delete('/{laporan}', [LaporanFakturController::class, 'destroy'])->name('destroy');
+    Route::resource('laporan_faktur', LaporanFakturController::class);
     
     // XML Export routes
     Route::get('/{laporan}/export-xml', [LaporanFakturController::class, 'exportXML'])->name('export.xml');
