@@ -14,7 +14,7 @@ class LaporanFakturController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
         $query = LaporanFaktur::query();
 
@@ -43,13 +43,22 @@ class LaporanFakturController extends Controller
 
         // Pagination
         $perPage = $request->get('per_page', 15);
-        $barangJasa = $query->paginate($perPage);
+        $laporans = $query->paginate($perPage);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $barangJasa,
-            'message' => 'Data barang/jasa berhasil diambil'
-        ]);
+        return view('laporanfaktur.index', compact('laporans'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        // Pass necessary data to the view
+        $taxPeriodMonth = now()->month;
+        $taxPeriodYear = now()->year;
+        $transactionDate = now()->format('Y-m-d');
+
+        return view('laporanfaktur.create', compact('taxPeriodMonth', 'taxPeriodYear', 'transactionDate'));
     }
 
     /**
