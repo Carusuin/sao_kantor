@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\LaporanFakturController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -34,14 +35,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
     
-    // Password Update Route (you can create a separate controller for this)
+    // Password Update Route
     Route::put('/password', function () {
-        // Placeholder for password update logic
         return redirect()->back()->with('success', 'Password berhasil diubah.');
     })->name('password.update');
     
+    // Laporan Routes
     Route::prefix('laporan')->name('laporan.')->group(function () {
-    // Main CRUD routes
     Route::get('/', [LaporanController::class, 'index'])->name('index');
     Route::get('/create', [LaporanController::class, 'create'])->name('create');
     Route::post('/', [LaporanController::class, 'store'])->name('store');
@@ -56,6 +56,24 @@ Route::middleware('auth')->group(function () {
     
     // AJAX routes
     Route::post('/generate', [LaporanController::class, 'generateLaporan'])->name('generate');
+    });
+    
+    // Laporan Faktur Routes
+    Route::prefix('laporan-faktur')->name('laporan_faktur.')->group(function () {
+    Route::get('/', [LaporanFakturController::class, 'index'])->name('index');
+    Route::get('/create', [LaporanFakturController::class, 'create'])->name('create');
+    Route::post('/', [LaporanFakturController::class, 'store'])->name('store');
+    Route::get('/{laporan}', [LaporanFakturController::class, 'show'])->name('show');
+    Route::get('/{laporan}/edit', [LaporanFakturController::class, 'edit'])->name('edit');
+    Route::put('/{laporan}', [LaporanFakturController::class, 'update'])->name('update');
+    Route::delete('/{laporan}', [LaporanFakturController::class, 'destroy'])->name('destroy');
+    Route::resource('laporan_faktur', LaporanFakturController::class);
+    
+    // XML Export routes
+    Route::get('/{laporan}/export-xml', [LaporanFakturController::class, 'exportXML'])->name('export.xml');
+    Route::get('/{laporan}/preview-xml', [LaporanFakturController::class, 'previewXML'])->name('preview.xml');
+    
+    // AJAX routes
+    Route::post('/generate', [LaporanFakturController::class, 'generateLaporan'])->name('generate');
 });
 });
-

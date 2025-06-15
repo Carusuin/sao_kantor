@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title', 'Dashboard') - Sistem Kantor</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <style>
         :root {
             --sidebar-width: 250px;
@@ -53,7 +54,7 @@
         .sidebar-header h4 {
             color: white;
             margin: 0;
-            font-weight: 600    ;
+            font-weight: 600;
         }
 
         .sidebar.collapsed .sidebar-header h4 {
@@ -79,7 +80,8 @@
             background: none;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             background-color: rgba(255, 255, 255, 0.1);
             color: white;
             transform: translateX(5px);
@@ -202,80 +204,89 @@
             .sidebar {
                 transform: translateX(-100%);
             }
-            
+
             .sidebar.show {
                 transform: translateX(0);
             }
-            
+
             .main-content {
                 margin-left: 0;
             }
-            
+
             .main-content.expanded {
                 margin-left: 0;
             }
         }
     </style>
-    
+
     @stack('styles')
 </head>
+
 <body>
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h4><i class="fas fa-building me-2"></i><span>Sistem Kantor</span></h4>
         </div>
-        
+
         <ul class="sidebar-nav list-unstyled">
             <li class="nav-item">
-                <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <a href="{{ route('dashboard') }}"
+                    class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
-            
+
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fas fa-users"></i>
                     <span>Manajemen User</span>
                 </a>
             </li>
-            
+
             <li class="nav-item">
-                <a href="{{ route('laporan.index') }}" class="nav-link {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
+                <a href="{{ route('laporan.index') }}"
+                    class="nav-link {{ request()->routeIs('laporan.*') ? 'active' : '' }}">
                     <i class="fas fa-file-alt"></i>
                     <span>Laporan</span>
                 </a>
             </li>
-            
+            <li class="nav-item">
+                <a href="{{ route('laporan_faktur.index') }}"
+                    class="nav-link {{ request()->routeIs('laporanfaktur.*') ? 'active' : '' }}">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Laporan E-Faktur</span>
+                </a>
+            </li>
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Jadwal</span>
                 </a>
             </li>
-            
+
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fas fa-tasks"></i>
                     <span>Tugas</span>
                 </a>
             </li>
-            
+
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fas fa-inbox"></i>
                     <span>Pesan</span>
                 </a>
             </li>
-            
+
             <li class="nav-item">
                 <a href="{{ route('profile') }}" class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
                     <i class="fas fa-user-circle"></i>
                     <span>Profile</span>
                 </a>
             </li>
-            
+
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fas fa-cog"></i>
@@ -295,7 +306,7 @@
                 </button>
                 <h5 class="mb-0">@yield('page-title', 'Dashboard')</h5>
             </div>
-            
+
             <div class="user-dropdown dropdown">
                 <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                     <i class="fas fa-user-circle me-2"></i>
@@ -303,12 +314,14 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="{{ route('profile') }}">
-                        <i class="fas fa-user me-2"></i>Profile
-                    </a></li>
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a></li>
                     <li><a class="dropdown-item" href="#">
-                        <i class="fas fa-cog me-2"></i>Pengaturan
-                    </a></li>
-                    <li><hr class="dropdown-divider"></li>
+                            <i class="fas fa-cog me-2"></i>Pengaturan
+                        </a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
                     <li>
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf
@@ -355,7 +368,7 @@
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -364,17 +377,17 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
-            
+
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
-            
+
             // Save state to localStorage
             const isCollapsed = sidebar.classList.contains('collapsed');
             localStorage.setItem('sidebarCollapsed', isCollapsed);
         }
 
         // Load sidebar state on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             if (isCollapsed) {
                 document.getElementById('sidebar').classList.add('collapsed');
@@ -389,10 +402,10 @@
         }
 
         // Close mobile sidebar when clicking outside
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.querySelector('.sidebar-toggle');
-            
+
             if (window.innerWidth <= 768) {
                 if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
                     sidebar.classList.remove('show');
@@ -401,15 +414,16 @@
         });
 
         // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
+        setTimeout(function () {
             const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
+            alerts.forEach(function (alert) {
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             });
         }, 5000);
     </script>
-    
+
     @stack('scripts')
 </body>
+
 </html>
