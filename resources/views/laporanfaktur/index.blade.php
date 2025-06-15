@@ -28,51 +28,54 @@
                         </div>
                     @endif
 
-                    @if($laporans->count() > 0)
+                    @if($fakturs->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th>No</th>
-                                        <th>Baris</th>
-                                        <th>Jenis</th>
-                                        <th>Kode</th>
-                                        <th>Nama Barang/Jasa</th>
-                                        <th>Satuan</th>
-                                        <th>Harga Satuan</th>
-                                        <th>Jumlah</th>
-                                        <th>DPP</th>
-                                        <th>PPN</th>
+                                        <th class="text-center">
+                                            <input type="checkbox" id="checkAll">
+                                        </th>
+                                        <th>NPWP Pembeli / Identitas lainnya</th>
+                                        <th>Nama Pembeli</th>
+                                        <th>Kode Transaksi <i class="fas fa-sort"></i></th>
+                                        <th>Nomor Faktur Pajak</th>
+                                        <th>Tanggal Faktur Pajak <i class="fas fa-sort"></i></th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($laporans as $index => $laporan)
+                                    @foreach($fakturs as $index => $faktur)
                                         <tr>
-                                            <td>{{ $laporans->firstItem() + $index }}</td>
-                                            <td>{{ $laporan->baris }}</td>
-                                            <td>{{ $laporan->jenis_barang_jasa_text }}</td>
-                                            <td>{{ $laporan->kode_barang_jasa }}</td>
-                                            <td>{{ $laporan->nama_barang_jasa }}</td>
-                                            <td>{{ $laporan->nama_satuan_ukur }}</td>
-                                            <td class="text-right">{{ $laporan->formatted_harga_satuan }}</td>
-                                            <td class="text-right">{{ number_format($laporan->jumlah_barang_jasa, 2, ',', '.') }}</td>
-                                            <td class="text-right">Rp {{ number_format($laporan->dpp, 0, ',', '.') }}</td>
-                                            <td class="text-right">Rp {{ number_format($laporan->ppn, 0, ',', '.') }}</td>
+                                            <td class="text-center">
+                                                <input type="checkbox" class="row-check">
+                                            </td>
+                                            <td>{{ $faktur->npwp_nik_pembeli }}</td>
+                                            <td>{{ $faktur->nama_pembeli }}</td>
+                                            <td>{{ $faktur->kode_transaksi }}</td>
+                                            <td>{{ $faktur->id }}</td>
+                                            <td>{{ $faktur->tanggal_faktur->format('d-m-Y') }}</td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <a href="{{ route('laporan_faktur.show', $laporan) }}" class="btn btn-info btn-sm" title="Lihat Detail">
+                                                    <a href="{{ route('laporan_faktur.show', $faktur->id) }}" class="btn btn-info btn-sm" title="Lihat Detail">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <a href="{{ route('laporan_faktur.edit', $laporan) }}" class="btn btn-warning btn-sm" title="Edit">
+                                                    <a href="{{ route('laporan_faktur.edit', $faktur->id) }}" class="btn btn-warning btn-sm" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <a href="{{ route('laporan_faktur.export.xml', $laporan) }}" class="btn btn-success btn-sm" title="Download XML">
+                                                    <a href="{{ route('laporan_faktur.export.xml', $faktur->id) }}" class="btn btn-success btn-sm" title="Download XML">
                                                         <i class="fas fa-download"></i>
                                                     </a>
-                                                    <a href="{{ route('laporan_faktur.preview.xml', $laporan) }}" class="btn btn-secondary btn-sm" target="_blank" title="Preview XML">
+                                                    <a href="{{ route('laporan_faktur.preview.xml', $faktur->id) }}" class="btn btn-secondary btn-sm" target="_blank" title="Preview XML">
                                                         <i class="fas fa-code"></i>
                                                     </a>
+                                                    <form action="{{ route('laporan_faktur.destroy', $faktur->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus faktur ini?\nIni juga akan menghapus semua detail terkait.')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>
@@ -82,7 +85,7 @@
                         </div>
 
                         <div class="mt-3">
-                            {{ $laporans->links() }}
+                            {{ $fakturs->links() }}
                         </div>
                     @else
                         <div class="alert alert-info">
