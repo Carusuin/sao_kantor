@@ -64,25 +64,82 @@ class LaporanFakturController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $validator = $this->validateBarangJasa($request);
+        try {
+            // Validate faktur data
+            $fakturData = $request->validate([
+                'tanggal_faktur' => 'required|date',
+                'jenis_faktur' => 'required|string',
+                'kode_transaksi' => 'required|string',
+                'referensi' => 'nullable|string',
+                'alamat_dokumen' => 'required|string',
+                'id_tku_dokumen' => 'required|string',
+                'npwp_pembeli' => 'required|string',
+                'buyer_id_type' => 'required|string',
+                'negara_pembeli' => 'required|string',
+                'nomor_dokumen_pembeli' => 'nullable|string',
+                'nama_pembeli' => 'required|string',
+                'alamat_pembeli' => 'required|string',
+                'email_pembeli' => 'nullable|email',
+                'id_tku_pembeli' => 'required|string',
+                'uang_muka' => 'boolean',
+                'pelunasan' => 'boolean',
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors()
-            ], 422);
+            // Create faktur record
+            $faktur = \App\Models\Faktur::create([
+                'tanggal_faktur' => $fakturData['tanggal_faktur'],
+                'jenis_faktur' => $fakturData['jenis_faktur'],
+                'kode_transaksi' => $fakturData['kode_transaksi'],
+                'referensi' => $fakturData['referensi'],
+                'alamat_penjual' => $fakturData['alamat_dokumen'],
+                'id_tku_penjual' => $fakturData['id_tku_dokumen'],
+                'npwp_nik_pembeli' => $fakturData['npwp_pembeli'],
+                'jenis_id_pembeli' => $fakturData['buyer_id_type'],
+                'negara_pembeli' => $fakturData['negara_pembeli'],
+                'nomor_dokumen_pembeli' => $fakturData['nomor_dokumen_pembeli'],
+                'nama_pembeli' => $fakturData['nama_pembeli'],
+                'alamat_pembeli' => $fakturData['alamat_pembeli'],
+                'email_pembeli' => $fakturData['email_pembeli'],
+                'id_tku_pembeli' => $fakturData['id_tku_pembeli'],
+                'uang_muka' => $request->boolean('uang_muka'),
+                'pelunasan' => $request->boolean('pelunasan'),
+            ]);
+
+            // Validate and store detail items
+            if ($request->has('items')) {
+                foreach ($request->items as $index => $item) {
+                    $detailData = [
+                        'faktur_id' => $faktur->id,
+                        'baris' => $index + 1,
+                        'barang_jasa' => $item['jenis_barang_jasa'],
+                        'kode_barang_jasa' => $item['kode_barang_jasa'],
+                        'nama_barang_jasa' => $item['nama_barang_jasa'],
+                        'nama_satuan_ukur' => $item['nama_satuan_ukur'],
+                        'harga_satuan' => $item['harga_satuan'],
+                        'jumlah_barang_jasa' => $item['jumlah_barang_jasa'],
+                        'total_diskon' => $item['total_diskon'] ?? 0,
+                        'dpp' => $item['dpp'] ?? 0,
+                        'dpp_nilai_lain' => $item['dpp_nilai_lain'] ?? 0,
+                        'tarif_ppn' => $item['tarif_ppn'] ?? 11.00,
+                        'ppn' => $item['ppn'] ?? 0,
+                        'tarif_ppnbm' => $item['tarif_ppnbm'] ?? 0,
+                        'ppnbm' => $item['ppnbm'] ?? 0,
+                    ];
+
+                    \App\Models\DetailFaktur::create($detailData);
+                }
+            }
+
+            return redirect()->route('laporan_faktur.index')
+                           ->with('success', 'Faktur berhasil disimpan');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                           ->withInput()
+                           ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $barangJasa = LaporanFaktur::create($request->validated());
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $barangJasa,
-            'message' => 'Data barang/jasa berhasil disimpan'
-        ], 201);
     }
 
     /**
