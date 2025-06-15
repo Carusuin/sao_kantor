@@ -10,7 +10,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">
                         <i class="fas fa-file-alt mr-2"></i>
-                        Daftar Laporan E-Faktur ANJAYYYYYY
+                        Daftar Laporan E-Faktur
                     </h3>
                     <a href="{{ route('laporan_faktur.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus mr-1"></i>
