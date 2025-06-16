@@ -33,51 +33,23 @@
                             <table class="table table-bordered table-striped">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th class="text-center">
-                                            <input type="checkbox" id="checkAll">
-                                        </th>
+                                        <th>ID</th>
                                         <th>NPWP Pembeli / Identitas lainnya</th>
                                         <th>Nama Pembeli</th>
-                                        <th>Kode Transaksi <i class="fas fa-sort"></i></th>
+                                        <th>Kode Transaksi</th>
                                         <th>Nomor Faktur Pajak</th>
-                                        <th>Tanggal Faktur Pajak <i class="fas fa-sort"></i></th>
-                                        <th>Aksi</th>
+                                        <th>Tanggal Faktur Pajak</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($fakturs as $index => $faktur)
                                         <tr>
-                                            <td class="text-center">
-                                                <input type="checkbox" class="row-check">
-                                            </td>
+                                            <td>{{ $faktur->id }}</td>
                                             <td>{{ $faktur->npwp_nik_pembeli }}</td>
                                             <td>{{ $faktur->nama_pembeli }}</td>
                                             <td>{{ $faktur->kode_transaksi }}</td>
-                                            <td>{{ $faktur->id }}</td>
+                                            <td>{{ $faktur->nomor_faktur }}</td>
                                             <td>{{ $faktur->tanggal_faktur->format('d-m-Y') }}</td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <a href="{{ route('laporan_faktur.show', $faktur->id) }}" class="btn btn-info btn-sm" title="Lihat Detail">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="{{ route('laporan_faktur.edit', $faktur->id) }}" class="btn btn-warning btn-sm" title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <a href="{{ route('laporan_faktur.export.xml', $faktur->id) }}" class="btn btn-success btn-sm" title="Download XML">
-                                                        <i class="fas fa-download"></i>
-                                                    </a>
-                                                    <a href="{{ route('laporan_faktur.preview.xml', $faktur->id) }}" class="btn btn-secondary btn-sm" target="_blank" title="Preview XML">
-                                                        <i class="fas fa-code"></i>
-                                                    </a>
-                                                    <form action="{{ route('laporan_faktur.destroy', $faktur->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus faktur ini?\nIni juga akan menghapus semua detail terkait.')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -104,14 +76,6 @@
     .table th {
         vertical-align: middle;
         white-space: nowrap;
-    }
-    
-    .btn-group .btn {
-        margin-right: 2px;
-    }
-    
-    .btn-group .btn:last-child {
-        margin-right: 0;
     }
 </style>
 @endpush 

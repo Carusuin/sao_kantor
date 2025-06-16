@@ -38,8 +38,15 @@
                                 </div>
                             </div>
                                     <div class="col-md-4">
-                                        <label for="nomorFaktur" class="form-label">Nomor Faktur</label>
-                                        <input type="text" class="form-control" id="nomorFaktur" name="nomor_faktur" placeholder="Nomor Faktur">
+                                        <label for="nomorFaktur" class="form-label">Nomor Faktur <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="nomorFaktur" name="nomor_faktur" 
+                                            placeholder="Nomor Faktur" required
+                                            pattern="[A-Z0-9.-]+" 
+                                            title="Nomor faktur hanya boleh berisi huruf kapital, angka, titik, dan tanda hubung"
+                                            maxlength="255">
+                                        <div class="invalid-feedback">
+                                            Nomor faktur harus diisi dan hanya boleh berisi huruf kapital, angka, titik, dan tanda hubung
+                                        </div>
                                     </div>
                                     <div class="col-md-4">
                                         <label for="kodeTransaksi" class="form-label">Kode Transaksi <span class="text-danger">*</span></label>

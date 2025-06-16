@@ -25,7 +25,8 @@ class Faktur extends Model
         'email_pembeli',
         'id_tku_pembeli',
         'uang_muka',
-        'pelunasan'
+        'pelunasan',
+        'nomor_faktur'
     ];
 
     protected $casts = [

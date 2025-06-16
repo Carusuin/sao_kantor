@@ -74,7 +74,7 @@ class LaporanFakturController extends Controller
                 'id_tku_pembeli' => 'required|string',
                 'uang_muka' => 'boolean',
                 'pelunasan' => 'boolean',
-                'nomor_faktur' => 'nullable|string|max:255',
+                'nomor_faktur' => 'required|string|max:255|regex:/^[A-Z0-9.-]+$/',
             ]);
 
             // Buat record faktur
@@ -179,7 +179,7 @@ class LaporanFakturController extends Controller
                 'id_tku_pembeli' => 'required|string',
                 'uang_muka' => 'boolean',
                 'pelunasan' => 'boolean',
-                'nomor_faktur' => 'nullable|string|max:255',
+                'nomor_faktur' => 'required|string|max:255|regex:/^[A-Z0-9.-]+$/',
             ]);
 
             $laporanFaktur->update([
