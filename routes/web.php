@@ -63,5 +63,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [LaporanFakturController::class, 'index'])->name('index');
         Route::get('/create', [LaporanFakturController::class, 'create'])->name('create');
         Route::post('/', [LaporanFakturController::class, 'store'])->name('store');
+        Route::get('/{laporanFaktur}', [LaporanFakturController::class, 'show'])->name('show');
     });
 });

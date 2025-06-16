@@ -141,7 +141,7 @@ class LaporanFakturController extends Controller
         $laporanFaktur->load('details'); // Eager load detail faktur
 
         // Meneruskan model Faktur sebagai 'laporan' untuk konsistensi dengan tampilan yang ada
-        return view('laporanfaktur.laporan_show', ['laporan' => $laporanFaktur]);
+        return view('laporanfaktur.laporan_show', compact('laporanFaktur'));
     }
 
     /**

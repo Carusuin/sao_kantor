@@ -39,6 +39,7 @@
                                         <th>Kode Transaksi</th>
                                         <th>Nomor Faktur Pajak</th>
                                         <th>Tanggal Faktur Pajak</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -50,6 +51,11 @@
                                             <td>{{ $faktur->kode_transaksi }}</td>
                                             <td>{{ $faktur->nomor_faktur }}</td>
                                             <td>{{ $faktur->tanggal_faktur->format('d-m-Y') }}</td>
+                                            <td>
+                                                <a href="{{ route('laporan_faktur.show', $faktur->id) }}" class="btn btn-info btn-sm" title="Lihat Detail">
+                                                    <i class="fas fa-eye"></i> Detail
+                                                </a>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
