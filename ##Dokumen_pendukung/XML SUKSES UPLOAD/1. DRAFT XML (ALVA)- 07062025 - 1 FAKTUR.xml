@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TaxInvoiceBulk xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <TIN>0023694821541000</TIN>
+  <ListOfTaxInvoice>
+    <TaxInvoice>
+      <TaxInvoiceDate>2025-06-07</TaxInvoiceDate>
+      <TaxInvoiceOpt>Normal</TaxInvoiceOpt>
+      <TrxCode>04</TrxCode>
+      <AddInfo/>
+      <CustomDoc/>
+      <RefDesc>SLS-070625-008</RefDesc>
+      <FacilityStamp/>
+      <SellerIDTKU>0023694821541000000000</SellerIDTKU>
+      <BuyerTin>0013084645091000</BuyerTin>
+      <BuyerDocument>TIN</BuyerDocument>
+      <BuyerCountry>IDN</BuyerCountry>
+      <BuyerDocumentNumber>SLS-070625-008</BuyerDocumentNumber>
+      <BuyerName>BANK PERMATA TBK</BuyerName>
+      <BuyerAdress>GEDUNG WTC II LT.1, 2, 21-30 JL JEND. SUDIRMAN KAV 29-31 KARET , RT 000, RW 000, KARET,
+SETIABUDI, KOTA ADM. JAKARTA SELATAN, DKI JAKARTA 12920</BuyerAdress>
+      <BuyerEmail>inten.rianti@permatabank.co.id</BuyerEmail>
+      <BuyerIDTKU>0013084645091000000000</BuyerIDTKU>
+      <ListOfGoodService>
+        <GoodService>
+          <Opt>B</Opt>
+          <Code>000000</Code>
+          <Name>PASANG AC</Name>
+          <Unit>UM.0030</Unit>
+          <Price>250000</Price>
+          <Qty>1</Qty>
+          <TotalDiscount>0</TotalDiscount>
+          <TaxBase>250000</TaxBase>
+          <OtherTaxBase>229167</OtherTaxBase>
+          <VATRate>12</VATRate>
+          <VAT>27500</VAT>
+          <STLGRate>0</STLGRate>
+          <STLG>0</STLG>
+        </GoodService>
+        <GoodService>
+          <Opt>A</Opt>
+          <Code>000000</Code>
+          <Name>PIPA SET 1/4 - 3/8</Name>
+          <Unit>UM.0013</Unit>
+          <Price>75000</Price>
+          <Qty>5</Qty>
+          <TotalDiscount>0</TotalDiscount>
+          <TaxBase>375000</TaxBase>
+          <OtherTaxBase>343750</OtherTaxBase>
+          <VATRate>12</VATRate>
+          <VAT>41250</VAT>
+          <STLGRate>0</STLGRate>
+          <STLG>0</STLG>
+        </GoodService>
+        <GoodService>
+          <Opt>A</Opt>
+          <Code>000000</Code>
+          <Name>BREKET OUTDOOR 1/2 PK</Name>
+          <Unit>UM.0019</Unit>
+          <Price>45000</Price>
+          <Qty>1</Qty>
+          <TotalDiscount>0</TotalDiscount>
+          <TaxBase>45000</TaxBase>
+          <OtherTaxBase>41250</OtherTaxBase>
+          <VATRate>12</VATRate>
+          <VAT>4950</VAT>
+          <STLGRate>0</STLGRate>
+          <STLG>0</STLG>
+        </GoodService>
+        <GoodService>
+          <Opt>A</Opt>
+          <Code>000000</Code>
+          <Name>SLANG DRAIN FLEXIBEL</Name>
+          <Unit>UM.0013</Unit>
+          <Price>5000</Price>
+          <Qty>2</Qty>
+          <TotalDiscount>0</TotalDiscount>
+          <TaxBase>10000</TaxBase>
+          <OtherTaxBase>9167</OtherTaxBase>
+          <VATRate>12</VATRate>
+          <VAT>1100</VAT>
+          <STLGRate>0</STLGRate>
+          <STLG>0</STLG>
+        </GoodService>
+        <GoodService>
+          <Opt>A</Opt>
+          <Code>000000</Code>
+          <Name>KABEL 3 X 1.5</Name>
+          <Unit>UM.0013</Unit>
+          <Price>18000</Price>
+          <Qty>7</Qty>
+          <TotalDiscount>0</TotalDiscount>
+          <TaxBase>126000</TaxBase>
+          <OtherTaxBase>115500</OtherTaxBase>
+          <VATRate>12</VATRate>
+          <VAT>13860</VAT>
+          <STLGRate>0</STLGRate>
+          <STLG>0</STLG>
+        </GoodService>
+      </ListOfGoodService>
+    </TaxInvoice>
+  </ListOfTaxInvoice>
+</TaxInvoiceBulk>
