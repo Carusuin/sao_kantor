@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LaporanFakturController;
+use App\Http\Controllers\EFakturXmlExportController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -64,5 +65,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', [LaporanFakturController::class, 'create'])->name('create');
         Route::post('/', [LaporanFakturController::class, 'store'])->name('store');
         Route::get('/{laporanFaktur}', [LaporanFakturController::class, 'show'])->name('show');
+    });
+
+    // E-Faktur XML Export Routes
+    Route::prefix('laporan-faktur/export')->name('efaktur.export.')->group(function () {
+        Route::get('all', [EFakturXmlExportController::class, 'exportAll'])->name('all');
+        Route::get('single/{faktur}', [EFakturXmlExportController::class, 'exportSingle'])->name('single');
+        Route::post('date-range', [EFakturXmlExportController::class, 'exportByDateRange'])->name('date-range');
+        Route::post('preview', [EFakturXmlExportController::class, 'preview'])->name('preview');
     });
 });
