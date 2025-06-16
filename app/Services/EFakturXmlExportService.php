@@ -15,7 +15,7 @@ class EFakturXmlExportService
     
     public function __construct()
     {
-        $this->dom = new DOMDocument('1.0', 'UTF-8');
+        $this->dom = new DOMDocument('1.0', 'utf-8');
         $this->dom->formatOutput = true;
     }
     
@@ -24,8 +24,8 @@ class EFakturXmlExportService
      */
     public function exportToXml(Collection $fakturs, array $options = []): string
     {
-        $this->createRootElement($options);
-        $this->addMetaData($fakturs, $options);
+        $this->createRootElement();
+        $this->addTinElement();
         $this->addFakturData($fakturs);
         
         return $this->dom->saveXML();
@@ -34,48 +34,21 @@ class EFakturXmlExportService
     /**
      * Create root XML element
      */
-    private function createRootElement(array $options): void
+    private function createRootElement(): void
     {
-        $rootName = $options['single'] ?? false ? 'EFakturReport' : 'EFakturReports';
-        $this->root = $this->dom->createElement($rootName);
-        $this->dom->appendChild($this->root);
-        
-        // Add XML namespace and schema info
+        $this->root = $this->dom->createElement('TaxInvoiceBulk');
+        $this->root->setAttribute('xmlns:xsd', 'http://www.w3.org/2001/XMLSchema');
         $this->root->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        $this->root->setAttribute('version', '1.0');
-        $this->root->setAttribute('generated', Carbon::now()->toISOString());
+        $this->dom->appendChild($this->root);
     }
     
     /**
-     * Add metadata to XML
+     * Add TIN element
      */
-    private function addMetaData(Collection $fakturs, array $options): void
+    private function addTinElement(): void
     {
-        $metaData = $this->dom->createElement('MetaData');
-        $this->root->appendChild($metaData);
-        
-        // Report info
-        $reportInfo = $this->dom->createElement('ReportInfo');
-        $metaData->appendChild($reportInfo);
-        
-        $this->addTextElement($reportInfo, 'TotalRecords', $fakturs->count());
-        $this->addTextElement($reportInfo, 'ExportDate', Carbon::now()->format('Y-m-d H:i:s'));
-        $this->addTextElement($reportInfo, 'ExportedBy', auth()->user()->name ?? 'System');
-        
-        // Summary data
-        if ($fakturs->count() > 0) {
-            $summary = $this->dom->createElement('Summary');
-            $metaData->appendChild($summary);
-            
-            $totalDPP = $fakturs->sum(function($faktur) {
-                return $faktur->details->sum('dpp');
-            });
-            
-            $this->addTextElement($summary, 'TotalDPP', number_format($totalDPP, 2, '.', ''));
-            $this->addTextElement($summary, 'DateRange', 
-                $fakturs->min('tanggal_faktur') . ' to ' . $fakturs->max('tanggal_faktur')
-            );
-        }
+        $tin = $this->dom->createElement('TIN', '0023694821541000');
+        $this->root->appendChild($tin);
     }
     
     /**
@@ -83,58 +56,126 @@ class EFakturXmlExportService
      */
     private function addFakturData(Collection $fakturs): void
     {
-        $dataContainer = $this->dom->createElement('Data');
-        $this->root->appendChild($dataContainer);
+        $listOfTaxInvoice = $this->dom->createElement('ListOfTaxInvoice');
+        $this->root->appendChild($listOfTaxInvoice);
         
         foreach ($fakturs as $faktur) {
-            $this->addSingleFaktur($dataContainer, $faktur);
+            $taxInvoice = $this->createTaxInvoiceElement($faktur);
+            $listOfTaxInvoice->appendChild($taxInvoice);
         }
     }
     
     /**
-     * Add single faktur record to XML
+     * Create single tax invoice element
      */
-    private function addSingleFaktur(DOMElement $container, Faktur $faktur): void
+    private function createTaxInvoiceElement(Faktur $faktur): DOMElement
     {
-        $record = $this->dom->createElement('EFakturRecord');
-        $container->appendChild($record);
+        $taxInvoice = $this->dom->createElement('TaxInvoice');
         
-        // Basic Info
-        $basicInfo = $this->dom->createElement('BasicInfo');
-        $record->appendChild($basicInfo);
+        // Basic invoice info
+        $this->addTextElement($taxInvoice, 'TaxInvoiceDate', $faktur->tanggal_faktur->format('Y-m-d'));
+        $this->addTextElement($taxInvoice, 'TaxInvoiceOpt', 'Normal');
+        $this->addTextElement($taxInvoice, 'TrxCode', $faktur->kode_transaksi ?? '04');
+        $this->addTextElement($taxInvoice, 'AddInfo', '');
+        $this->addTextElement($taxInvoice, 'CustomDoc', '');
+        $this->addTextElement($taxInvoice, 'RefDesc', $faktur->nomor_faktur);
+        $this->addTextElement($taxInvoice, 'FacilityStamp', '');
         
-        $this->addTextElement($basicInfo, 'ID', $faktur->id);
-        $this->addTextElement($basicInfo, 'TanggalFaktur', $faktur->tanggal_faktur->format('Y-m-d'));
-        $this->addTextElement($basicInfo, 'JenisFaktur', $faktur->jenis_faktur);
-        $this->addTextElement($basicInfo, 'KodeTransaksi', $faktur->kode_transaksi);
-        $this->addTextElement($basicInfo, 'NomorFaktur', $faktur->nomor_faktur);
+        // Seller info
+        $this->addTextElement($taxInvoice, 'SellerIDTKU', $faktur->id_tku_penjual ?? '0023694821541000000000');
         
-        // Buyer Info
-        $buyerInfo = $this->dom->createElement('BuyerInfo');
-        $record->appendChild($buyerInfo);
+        // Buyer info
+        $this->addTextElement($taxInvoice, 'BuyerTin', $faktur->npwp_nik_pembeli);
+        $this->addTextElement($taxInvoice, 'BuyerDocument', 'TIN');
+        $this->addTextElement($taxInvoice, 'BuyerCountry', $faktur->negara_pembeli ?? 'IDN');
+        $this->addTextElement($taxInvoice, 'BuyerDocumentNumber', $faktur->nomor_dokumen_pembeli ?? $faktur->nomor_faktur);
+        $this->addTextElement($taxInvoice, 'BuyerName', $faktur->nama_pembeli);
+        $this->addTextElement($taxInvoice, 'BuyerAdress', $faktur->alamat_pembeli);
+        $this->addTextElement($taxInvoice, 'BuyerEmail', $faktur->email_pembeli);
+        $this->addTextElement($taxInvoice, 'BuyerIDTKU', $faktur->id_tku_pembeli);
         
-        $this->addTextElement($buyerInfo, 'NPWP_NIK', $faktur->npwp_nik_pembeli);
-        $this->addTextElement($buyerInfo, 'JenisID', $faktur->jenis_id_pembeli);
-        $this->addTextElement($buyerInfo, 'NamaPembeli', $faktur->nama_pembeli);
-        $this->addTextElement($buyerInfo, 'AlamatPembeli', $faktur->alamat_pembeli);
-        $this->addTextElement($buyerInfo, 'EmailPembeli', $faktur->email_pembeli);
-        
-        // Transaction Details
-        $details = $this->dom->createElement('Details');
-        $record->appendChild($details);
+        // List of goods/services
+        $listOfGoodService = $this->dom->createElement('ListOfGoodService');
+        $taxInvoice->appendChild($listOfGoodService);
         
         foreach ($faktur->details as $detail) {
-            $detailElement = $this->dom->createElement('Detail');
-            $details->appendChild($detailElement);
-            
-            $this->addTextElement($detailElement, 'Baris', $detail->baris);
-            $this->addTextElement($detailElement, 'NamaBarangJasa', $detail->nama_barang_jasa);
-            $this->addTextElement($detailElement, 'Jumlah', number_format($detail->jumlah_barang_jasa, 2, '.', ''));
-            $this->addTextElement($detailElement, 'HargaSatuan', number_format($detail->harga_satuan, 2, '.', ''));
-            $this->addTextElement($detailElement, 'DPP', number_format($detail->dpp, 2, '.', ''));
-            $this->addTextElement($detailElement, 'PPN', number_format($detail->ppn, 2, '.', ''));
-            $this->addTextElement($detailElement, 'PPNBM', number_format($detail->ppnbm, 2, '.', ''));
+            $goodService = $this->createGoodServiceElement($detail);
+            $listOfGoodService->appendChild($goodService);
         }
+        
+        return $taxInvoice;
+    }
+    
+    /**
+     * Create good service element
+     */
+    private function createGoodServiceElement($detail): DOMElement
+    {
+        $goodService = $this->dom->createElement('GoodService');
+        
+        // Determine Opt based on item type
+        $opt = $this->determineOptType($detail->nama_barang_jasa);
+        
+        $this->addTextElement($goodService, 'Opt', $opt);
+        $this->addTextElement($goodService, 'Code', $detail->kode_barang_jasa ?? '000000');
+        $this->addTextElement($goodService, 'Name', $detail->nama_barang_jasa);
+        $this->addTextElement($goodService, 'Unit', $this->getUnitCode($detail->nama_satuan_ukur));
+        $this->addTextElement($goodService, 'Price', number_format($detail->harga_satuan, 2, '.', ''));
+        $this->addTextElement($goodService, 'Qty', number_format($detail->jumlah_barang_jasa, 2, '.', ''));
+        $this->addTextElement($goodService, 'TotalDiscount', number_format($detail->total_diskon ?? 0, 2, '.', ''));
+        
+        // Calculate tax base
+        $taxBase = $detail->harga_satuan * $detail->jumlah_barang_jasa - ($detail->total_diskon ?? 0);
+        $this->addTextElement($goodService, 'TaxBase', number_format($taxBase, 2, '.', ''));
+        
+        // Calculate other tax base (before VAT)
+        $otherTaxBase = round($taxBase / (1 + ($detail->tarif_ppn / 100)), 0);
+        $this->addTextElement($goodService, 'OtherTaxBase', number_format($otherTaxBase, 2, '.', ''));
+        
+        $this->addTextElement($goodService, 'VATRate', number_format($detail->tarif_ppn ?? 12, 2, '.', ''));
+        $this->addTextElement($goodService, 'VAT', number_format($detail->ppn ?? ($taxBase * 0.12), 2, '.', ''));
+        $this->addTextElement($goodService, 'STLGRate', number_format($detail->tarif_ppnbm ?? 0, 2, '.', ''));
+        $this->addTextElement($goodService, 'STLG', number_format($detail->ppnbm ?? 0, 2, '.', ''));
+        
+        return $goodService;
+    }
+    
+    /**
+     * Determine Opt type based on item name
+     */
+    private function determineOptType($itemName): string
+    {
+        $serviceKeywords = ['VACUUM', 'B/P', 'LAS', 'SERVICE', 'JASA'];
+        
+        foreach ($serviceKeywords as $keyword) {
+            if (stripos($itemName, $keyword) !== false) {
+                return 'B'; // Service
+            }
+        }
+        
+        return 'A'; // Goods (default)
+    }
+    
+    /**
+     * Get unit code based on unit name
+     */
+    private function getUnitCode($unitName): string
+    {
+        $unitMapping = [
+            'PCS' => 'UM.0018',
+            'UNIT' => 'UM.0018',
+            'BUAH' => 'UM.0018',
+            'KG' => 'UM.0003',
+            'LITER' => 'UM.0003',
+            'BOTOL' => 'UM.0003',
+            'JAM' => 'UM.0030',
+            'HARI' => 'UM.0030',
+            'PAKET' => 'UM.0021',
+            'SET' => 'UM.0021'
+        ];
+        
+        $unitName = strtoupper($unitName ?? 'PCS');
+        return $unitMapping[$unitName] ?? 'UM.0018';
     }
     
     /**
@@ -152,12 +193,7 @@ class EFakturXmlExportService
      */
     public function generateFilename(array $options = []): string
     {
-        $timestamp = Carbon::now()->format('YmdHis');
-        
-        if (isset($options['single']) && $options['single']) {
-            return "efaktur_report_single_{$timestamp}.xml";
-        }
-        
-        return "efaktur_report_{$timestamp}.xml";
+        $timestamp = Carbon::now()->format('Ymd_His');
+        return "tax_invoice_bulk_{$timestamp}.xml";
     }
 } 

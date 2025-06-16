@@ -35,9 +35,13 @@ class EFakturXmlExportController extends Controller
             $xmlContent = $this->xmlExportService->exportToXml($fakturs);
             $filename = $this->xmlExportService->generateFilename();
             
-            $this->logExportActivity('all', $fakturs->count());
-            
-            return $this->downloadXml($xmlContent, $filename);
+            return response($xmlContent, 200, [
+                'Content-Type' => 'application/xml',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
             
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal mengekspor data: ' . $e->getMessage());
@@ -51,12 +55,16 @@ class EFakturXmlExportController extends Controller
     {
         try {
             $faktur->load('details');
-            $xmlContent = $this->xmlExportService->exportToXml(collect([$faktur]), ['single' => true]);
-            $filename = $this->xmlExportService->generateFilename(['single' => true]);
+            $xmlContent = $this->xmlExportService->exportToXml(collect([$faktur]));
+            $filename = $this->xmlExportService->generateFilename();
             
-            $this->logExportActivity('single', 1, ['faktur_id' => $faktur->id]);
-            
-            return $this->downloadXml($xmlContent, $filename);
+            return response($xmlContent, 200, [
+                'Content-Type' => 'application/xml',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
             
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal mengekspor e-faktur: ' . $e->getMessage());
@@ -94,14 +102,15 @@ class EFakturXmlExportController extends Controller
             }
             
             $xmlContent = $this->xmlExportService->exportToXml($fakturs);
-            $filename = 'efaktur_report_' . $startDate->format('Ymd') . '_to_' . $endDate->format('Ymd') . '_' . Carbon::now()->format('His') . '.xml';
+            $filename = $this->xmlExportService->generateFilename();
             
-            $this->logExportActivity('date_range', $fakturs->count(), [
-                'start_date' => $startDate->format('Y-m-d'),
-                'end_date' => $endDate->format('Y-m-d')
+            return response($xmlContent, 200, [
+                'Content-Type' => 'application/xml',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
             ]);
-            
-            return $this->downloadXml($xmlContent, $filename);
             
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal mengekspor data berdasarkan tanggal: ' . $e->getMessage());
@@ -141,33 +150,5 @@ class EFakturXmlExportController extends Controller
                 'message' => 'Gagal membuat preview: ' . $e->getMessage()
             ]);
         }
-    }
-    
-    /**
-     * Download XML response helper
-     */
-    private function downloadXml(string $xmlContent, string $filename): Response
-    {
-        return response($xmlContent, 200, [
-            'Content-Type' => 'application/xml',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-            'Cache-Control' => 'no-cache, no-store, must-revalidate',
-            'Pragma' => 'no-cache',
-            'Expires' => '0'
-        ]);
-    }
-    
-    /**
-     * Log export activity
-     */
-    private function logExportActivity(string $type, int $recordCount, array $metadata = []): void
-    {
-        \Log::info('E-Faktur XML Export Activity', [
-            'type' => $type,
-            'record_count' => $recordCount,
-            'user_id' => auth()->id(),
-            'metadata' => $metadata,
-            'timestamp' => Carbon::now()
-        ]);
     }
 } 
