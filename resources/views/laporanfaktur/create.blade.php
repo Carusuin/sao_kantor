@@ -345,15 +345,15 @@ $(document).ready(function() {
                 </td>
                 <td>
                     <select class="form-select form-select-sm item-type" name="items[${rowCounter}][jenis_barang_jasa]">
-                        <option value="B" ${data.jenis_barang_jasa === 'B' ? 'selected' : ''}>Barang</option>
-                        <option value="J" ${data.jenis_barang_jasa === 'J' ? 'selected' : ''}>Jasa</option>
+                        <option value="A" ${data.jenis_barang_jasa === 'A' ? 'selected' : ''}>Barang</option>
+                        <option value="B" ${data.jenis_barang_jasa === 'B' ? 'selected' : ''}>Jasa</option>
                     </select>
                 </td>
                 <td>
                     <input type="text" class="form-control form-control-sm item-name" name="items[${rowCounter}][nama_barang_jasa]" value="${data.nama_barang_jasa || ''}" required>
                 </td>
                 <td>
-                    <input type="text" class="form-control form-control-sm item-code" name="items[${rowCounter}][kode_barang_jasa]" value="${data.kode_barang_jasa || ''}" required>
+                    <input type="text" class="form-control form-control-sm item-code" name="items[${rowCounter}][kode_barang_jasa]" value="000000" readonly>
                 </td>
                 <td>
                     <input type="number" class="form-control form-control-sm item-qty" name="items[${rowCounter}][jumlah_barang_jasa]" value="${data.jumlah_barang_jasa || ''}" step="any" min="0" required>

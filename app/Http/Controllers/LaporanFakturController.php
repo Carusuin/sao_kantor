@@ -146,17 +146,16 @@ class LaporanFakturController extends Controller
                         'kode_barang_jasa' => $item['kode_barang_jasa'],
                         'nama_barang_jasa' => $item['nama_barang_jasa'],
                         'nama_satuan_ukur' => $item['nama_satuan_ukur'],
-                        'harga_satuan' => $item['harga_satuan'],
-                        'jumlah_barang_jasa' => $item['jumlah_barang_jasa'],
-                        'total_diskon' => $item['total_diskon'] ?? 0,
-                        'dpp' => $item['dpp'] ?? 0,
-                        'dpp_nilai_lain' => $item['dpp_nilai_lain'] ?? 0,
-                        'tarif_ppn' => $item['tarif_ppn'] ?? 11.00,
-                        'ppn' => $item['ppn'] ?? 0,
-                        'tarif_ppnbm' => $item['tarif_ppnbm'] ?? 0,
-                        'ppnbm' => $item['ppnbm'] ?? 0,
+                        'harga_satuan' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['harga_satuan'])),
+                        'jumlah_barang_jasa' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['jumlah_barang_jasa'])),
+                        'total_diskon' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['total_diskon'] ?? 0)),
+                        'dpp' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['dpp'] ?? 0)),
+                        'dpp_nilai_lain' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['dpp_nilai_lain'] ?? 0)),
+                        'tarif_ppn' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['tarif_ppn'] ?? 12)),
+                        'ppn' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['ppn'] ?? 0)),
+                        'tarif_ppnbm' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['tarif_ppnbm'] ?? 0)),
+                        'ppnbm' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['ppnbm'] ?? 0)),
                     ];
-
                     DetailFaktur::create($detailData);
                 }
             }
@@ -253,15 +252,15 @@ class LaporanFakturController extends Controller
                         'kode_barang_jasa' => $item['kode_barang_jasa'],
                         'nama_barang_jasa' => $item['nama_barang_jasa'],
                         'nama_satuan_ukur' => $item['nama_satuan_ukur'],
-                        'harga_satuan' => $item['harga_satuan'],
-                        'jumlah_barang_jasa' => $item['jumlah_barang_jasa'],
-                        'total_diskon' => $item['total_diskon'] ?? 0,
-                        'dpp' => $item['dpp'] ?? 0,
-                        'dpp_nilai_lain' => $item['dpp_nilai_lain'] ?? 0,
-                        'tarif_ppn' => $item['tarif_ppn'] ?? 11.00,
-                        'ppn' => $item['ppn'] ?? 0,
-                        'tarif_ppnbm' => $item['tarif_ppnbm'] ?? 0,
-                        'ppnbm' => $item['ppnbm'] ?? 0,
+                        'harga_satuan' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['harga_satuan'])),
+                        'jumlah_barang_jasa' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['jumlah_barang_jasa'])),
+                        'total_diskon' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['total_diskon'] ?? 0)),
+                        'dpp' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['dpp'] ?? 0)),
+                        'dpp_nilai_lain' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['dpp_nilai_lain'] ?? 0)),
+                        'tarif_ppn' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['tarif_ppn'] ?? 12)),
+                        'ppn' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['ppn'] ?? 0)),
+                        'tarif_ppnbm' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['tarif_ppnbm'] ?? 0)),
+                        'ppnbm' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['ppnbm'] ?? 0)),
                     ];
                     DetailFaktur::create($detailData);
                 }
