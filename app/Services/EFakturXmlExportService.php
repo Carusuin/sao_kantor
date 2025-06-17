@@ -12,6 +12,7 @@ class EFakturXmlExportService
 {
     protected $dom;
     protected $root;
+    protected $fakturs;
     
     public function __construct()
     {
@@ -24,6 +25,7 @@ class EFakturXmlExportService
      */
     public function exportToXml(Collection $fakturs, array $options = []): string
     {
+        $this->fakturs = $fakturs;
         $this->createRootElement();
         $this->addTinElement();
         $this->addFakturData($fakturs);
@@ -47,7 +49,9 @@ class EFakturXmlExportService
      */
     private function addTinElement(): void
     {
-        $tin = $this->dom->createElement('TIN', '0023694821541000');
+        // Get the first faktur to get the seller's NPWP
+        $firstFaktur = $this->fakturs->first();
+        $tin = $this->dom->createElement('TIN', $firstFaktur->npwp_penjual);
         $this->root->appendChild($tin);
     }
     
@@ -78,7 +82,7 @@ class EFakturXmlExportService
         $this->addTextElement($taxInvoice, 'TrxCode', $faktur->kode_transaksi ?? '04');
         $this->addTextElement($taxInvoice, 'AddInfo', '');
         $this->addTextElement($taxInvoice, 'CustomDoc', '');
-        $this->addTextElement($taxInvoice, 'RefDesc', $faktur->nomor_faktur);
+        $this->addTextElement($taxInvoice, 'RefDesc', $faktur->referensi);
         $this->addTextElement($taxInvoice, 'FacilityStamp', '');
         
         // Seller info
@@ -87,8 +91,8 @@ class EFakturXmlExportService
         // Buyer info
         $this->addTextElement($taxInvoice, 'BuyerTin', $faktur->npwp_nik_pembeli);
         $this->addTextElement($taxInvoice, 'BuyerDocument', 'TIN');
-        $this->addTextElement($taxInvoice, 'BuyerCountry', $faktur->negara_pembeli ?? 'IDN');
-        $this->addTextElement($taxInvoice, 'BuyerDocumentNumber', $faktur->nomor_dokumen_pembeli ?? $faktur->nomor_faktur);
+        $this->addTextElement($taxInvoice, 'BuyerCountry', $this->getCountryCode($faktur->negara_pembeli));
+        $this->addTextElement($taxInvoice, 'BuyerDocumentNumber', $faktur->referensi);
         $this->addTextElement($taxInvoice, 'BuyerName', $faktur->nama_pembeli);
         $this->addTextElement($taxInvoice, 'BuyerAdress', $faktur->alamat_pembeli);
         $this->addTextElement($taxInvoice, 'BuyerEmail', $faktur->email_pembeli);
@@ -104,6 +108,28 @@ class EFakturXmlExportService
         }
         
         return $taxInvoice;
+    }
+    
+    /**
+     * Convert country name to ISO code
+     */
+    private function getCountryCode($countryName): string
+    {
+        $countryMapping = [
+            'Indonesia' => 'IDN',
+            'Singapore' => 'SGP',
+            'Malaysia' => 'MYS',
+            'Thailand' => 'THA',
+            'Vietnam' => 'VNM',
+            'Philippines' => 'PHL',
+            'Brunei' => 'BRN',
+            'Cambodia' => 'KHM',
+            'Laos' => 'LAO',
+            'Myanmar' => 'MMR',
+            'East Timor' => 'TLS'
+        ];
+        
+        return $countryMapping[$countryName] ?? 'IDN';
     }
     
     /**

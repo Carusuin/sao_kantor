@@ -16,6 +16,7 @@ class Faktur extends Model
         'referensi',
         'alamat_penjual',
         'id_tku_penjual',
+        'npwp_penjual',
         'npwp_nik_pembeli',
         'jenis_id_pembeli',
         'negara_pembeli',

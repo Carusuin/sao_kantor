@@ -66,14 +66,14 @@
                                     <div class="col-md-3">
                                         <label for="tanggalFaktur" class="form-label">Tanggal Faktur <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="tanggalFaktur" name="tanggal_faktur" value="{{ now()->format('Y-m-d') }}" required>
-                            </div>
+                                    </div>
                                     <div class="col-md-3">
                                         <label for="jenisFaktur" class="form-label">Jenis Faktur <span class="text-danger">*</span></label>
                                         <select class="form-select" id="jenisFaktur" name="jenis_faktur" required>
                                             <option value="Normal">Normal</option>
                                             <option value="Pengganti">Pengganti</option>
                                         </select>
-                                </div>
+                                    </div>
                                     <div class="col-md-3">
                                         <label for="masaPajak" class="form-label">Masa Pajak <span class="text-danger">*</span></label>
                                         <select class="form-select" id="masaPajak" name="masa_pajak" required>
@@ -81,16 +81,20 @@
                                                 <option value="{{ $key + 1 }}" {{ (date('n') == ($key + 1)) ? 'selected' : '' }}>{{ $month }}</option>
                                             @endforeach
                                         </select>
-                            </div>
+                                    </div>
                                     <div class="col-md-3">
                                         <label for="tahunPajak" class="form-label">Tahun <span class="text-danger">*</span></label>
                                         <input type="number" class="form-control" id="tahunPajak" name="tahun_pajak" value="{{ date('Y') }}" required>
-                        </div>
+                                    </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
+                                        <label for="npwpPenjual" class="form-label">NPWP Penjual <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="npwpPenjual" name="npwp_penjual" placeholder="0013575832046000" required>
+                                    </div>
+                                    <div class="col-md-3">
                                         <label for="referensi" class="form-label">Referensi</label>
-                                        <input type="text" class="form-control" id="referensi" name="referensi" placeholder="Uraian">
+                                        <input type="text" class="form-control" id="referensi" name="referensi" readonly>
                                     </div>
                                     <div class="col-md-3">
                                         <label for="alamatDokumen" class="form-label">Alamat <span class="text-danger">*</span></label>
@@ -98,8 +102,8 @@
                                     </div>
                                     <div class="col-md-3">
                                         <label for="idTKUdokumen" class="form-label">IDTKU <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="idTKUdokumen" name="id_tku_dokumen" placeholder="000000" required>
-                            </div>
+                                        <input type="text" class="form-control" id="idTKUdokumen" name="id_tku_dokumen" placeholder="000000" readonly required>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -139,8 +143,17 @@
                                     <div class="col-md-4">
                                         <label for="negaraPembeli" class="form-label">Negara</label>
                                         <select class="form-select" id="negaraPembeli" name="negara_pembeli">
-                                            <option value="Indonesia" selected>Indonesia</option>
-                                            <option value="Lainnya">Lainnya</option>
+                                            <option value="IDN" selected>Indonesia</option>
+                                            <option value="SGP">Singapore</option>
+                                            <option value="MYS">Malaysia</option>
+                                            <option value="THA">Thailand</option>
+                                            <option value="VNM">Vietnam</option>
+                                            <option value="PHL">Philippines</option>
+                                            <option value="BRN">Brunei</option>
+                                            <option value="KHM">Cambodia</option>
+                                            <option value="LAO">Laos</option>
+                                            <option value="MMR">Myanmar</option>
+                                            <option value="TLS">East Timor</option>
                                         </select>
                                     </div>
                                 </div>
@@ -161,7 +174,7 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <label for="idTKUPembeli" class="form-label">IDTKU <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="idTKUPembeli" name="id_tku_pembeli" placeholder="000000" required>
+                                        <input type="text" class="form-control" id="idTKUPembeli" name="id_tku_pembeli" placeholder="000000" readonly required>
                             </div>
                                     <div class="col-md-4">
                                         <label for="emailPembeli" class="form-label">Email</label>
@@ -281,6 +294,43 @@
 <script>
 $(document).ready(function() {
     let rowCounter = 0;
+
+    // Function to generate IDTKU from NPWP/TIN
+    function generateIDTKU(npwp) {
+        if (!npwp) return '';
+        // Remove any non-numeric characters
+        npwp = npwp.replace(/\D/g, '');
+        // Add 6 zeros at the end
+        return npwp + '000000';
+    }
+
+    // Update seller IDTKU when NPWP changes
+    $('#npwpPenjual').on('input', function() {
+        const npwp = $(this).val();
+        $('#idTKUdokumen').val(generateIDTKU(npwp));
+    });
+
+    // Update buyer IDTKU when NPWP changes
+    $('#npwpPembeli').on('input', function() {
+        const npwp = $(this).val();
+        $('#idTKUPembeli').val(generateIDTKU(npwp));
+    });
+
+    // Function to update referensi based on nomor dokumen
+    function updateReferensi() {
+        const nomorDokumen = $('#nomorDokumenPembeli').val();
+        $('#referensi').val(nomorDokumen);
+    }
+
+    // Listen for changes in nomor dokumen
+    $('#nomorDokumenPembeli').on('input', function() {
+        updateReferensi();
+    });
+
+    // Initial update of referensi and IDTKU fields
+    updateReferensi();
+    $('#npwpPenjual').trigger('input');
+    $('#npwpPembeli').trigger('input');
 
     function addTransactionRow(data = {}) {
         rowCounter++;
