@@ -334,6 +334,10 @@ $(document).ready(function() {
 
     function addTransactionRow(data = {}) {
         rowCounter++;
+        let unitOptions = '';
+        @foreach($units as $unit)
+            unitOptions += `<option value="{{ $unit['code'] }}" ${(data.nama_satuan_ukur === '{{ $unit['code'] }}') ? 'selected' : ''}>{{ $unit['name'] }}</option>`;
+        @endforeach
         const newRow = `
             <tr data-row-id="${rowCounter}">
                 <td class="text-center">
@@ -352,37 +356,39 @@ $(document).ready(function() {
                     <input type="text" class="form-control form-control-sm item-code" name="items[${rowCounter}][kode_barang_jasa]" value="${data.kode_barang_jasa || ''}" required>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-qty" name="items[${rowCounter}][jumlah_barang_jasa]" value="${data.jumlah_barang_jasa || '1.00'}" step="0.01" min="0" required>
+                    <input type="number" class="form-control form-control-sm item-qty" name="items[${rowCounter}][jumlah_barang_jasa]" value="${data.jumlah_barang_jasa || ''}" step="any" min="0" required>
                 </td>
                 <td>
-                    <input type="text" class="form-control form-control-sm item-unit" name="items[${rowCounter}][nama_satuan_ukur]" value="${data.nama_satuan_ukur || ''}" required>
+                    <select class="form-select form-select-sm item-unit" name="items[${rowCounter}][nama_satuan_ukur]" required>
+                        ${unitOptions}
+                    </select>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-price" name="items[${rowCounter}][harga_satuan]" value="${data.harga_satuan || '0.00'}" step="0.01" min="0" required>
+                    <input type="number" class="form-control form-control-sm item-price" name="items[${rowCounter}][harga_satuan]" value="${data.harga_satuan || ''}" step="any" min="0" required>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-total" name="items[${rowCounter}][total_harga]" value="${data.total_harga || '0.00'}" step="0.01" min="0" readonly>
+                    <input type="number" class="form-control form-control-sm item-total" name="items[${rowCounter}][total_harga]" value="" step="any" min="0" readonly>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-discount" name="items[${rowCounter}][total_diskon]" value="${data.total_diskon || '0.00'}" step="0.01" min="0">
+                    <input type="number" class="form-control form-control-sm item-discount" name="items[${rowCounter}][total_diskon]" value="0" step="any" min="0" readonly>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-vat-rate" name="items[${rowCounter}][tarif_ppn]" value="${data.tarif_ppn || '11.00'}" step="0.01" min="0" max="100" required>
+                    <input type="number" class="form-control form-control-sm item-vat-rate" name="items[${rowCounter}][tarif_ppn]" value="12" step="any" min="0" max="100" readonly>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-dpp" name="items[${rowCounter}][dpp]" value="${data.dpp || '0.00'}" step="0.01" min="0" readonly>
+                    <input type="number" class="form-control form-control-sm item-dpp" name="items[${rowCounter}][dpp]" value="" step="any" min="0" readonly>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-ppn" name="items[${rowCounter}][ppn]" value="${data.ppn || '0.00'}" step="0.01" min="0" readonly>
+                    <input type="number" class="form-control form-control-sm item-ppn" name="items[${rowCounter}][ppn]" value="" step="any" min="0" readonly>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-dpp-lain" name="items[${rowCounter}][dpp_nilai_lain]" value="${data.dpp_nilai_lain || '0.00'}" step="0.01" min="0">
+                    <input type="number" class="form-control form-control-sm item-dpp-lain" name="items[${rowCounter}][dpp_nilai_lain]" value="" step="any" min="0" readonly>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-ppnbm" name="items[${rowCounter}][ppnbm]" value="${data.ppnbm || '0.00'}" step="0.01" min="0">
+                    <input type="number" class="form-control form-control-sm item-ppnbm" name="items[${rowCounter}][ppnbm]" value="0" step="any" min="0" readonly>
                 </td>
                 <td>
-                    <input type="number" class="form-control form-control-sm item-ppnbm-rate" name="items[${rowCounter}][tarif_ppnbm]" value="${data.tarif_ppnbm || '0.00'}" step="0.01" min="0" max="100">
+                    <input type="number" class="form-control form-control-sm item-ppnbm-rate" name="items[${rowCounter}][tarif_ppnbm]" value="0" step="any" min="0" max="100" readonly>
                 </td>
             </tr>
         `;
@@ -393,16 +399,26 @@ $(document).ready(function() {
     function calculateRow(row) {
         const qty = parseFloat(row.find('.item-qty').val()) || 0;
         const price = parseFloat(row.find('.item-price').val()) || 0;
-        const discount = parseFloat(row.find('.item-discount').val()) || 0;
-        const vatRate = parseFloat(row.find('.item-vat-rate').val()) || 0;
+        // Rumus
+        const totalHarga = price * qty;
+        const potonganHarga = 0;
+        const tarifPPN = 12;
+        const dpp = totalHarga;
+        // Pembulatan sesuai rumus Excel untuk DPP Nilai Lain
+        let dppNilaiLain = Math.round(Math.round(dpp * 11 / 12 * 100) / 100);
+        // Pembulatan sesuai rumus Excel untuk PPN
+        let ppn = Math.round(Math.round(dppNilaiLain * 12 * 100) / 10000);
+        const ppnbm = 0;
+        const tarifPPNBM = 0;
 
-        const totalHarga = (qty * price) - discount;
-        const dpp = totalHarga; // For simplicity, assuming DPP is total harga before PPN
-        const ppn = dpp * (vatRate / 100);
-
-        row.find('.item-total').val(totalHarga.toFixed(2));
-        row.find('.item-dpp').val(dpp.toFixed(2));
-        row.find('.item-ppn').val(ppn.toFixed(2));
+        row.find('.item-total').val(totalHarga ? totalHarga.toFixed(2) : '');
+        row.find('.item-discount').val('0');
+        row.find('.item-vat-rate').val('12');
+        row.find('.item-dpp').val(dpp ? dpp.toFixed(2) : '');
+        row.find('.item-dpp-lain').val(dppNilaiLain ? dppNilaiLain : '');
+        row.find('.item-ppn').val(ppn ? ppn : '');
+        row.find('.item-ppnbm').val('0');
+        row.find('.item-ppnbm-rate').val('0');
     }
 
     function updateTotals() {
@@ -425,12 +441,12 @@ $(document).ready(function() {
             ppnbmSum += parseFloat(row.find('.item-ppnbm').val()) || 0;
         });
 
-        $('.total-harga-sum').text(totalHargaSum.toFixed(2).replace('.', ','));
-        $('.potongan-harga-sum').text(potonganHargaSum.toFixed(2).replace('.', ','));
-        $('.dpp-sum').text(dppSum.toFixed(2).replace('.', ','));
-        $('.ppn-sum').text(ppnSum.toFixed(2).replace('.', ','));
-        $('.dpp-nilai-lain-sum').text(dppNilaiLainSum.toFixed(2).replace('.', ','));
-        $('.ppnbm-sum').text(ppnbmSum.toFixed(2).replace('.', ','));
+        $('.total-harga-sum').text(totalHargaSum.toFixed(2));
+        $('.potongan-harga-sum').text(potonganHargaSum.toFixed(2));
+        $('.dpp-sum').text(dppSum.toFixed(2));
+        $('.ppn-sum').text(ppnSum.toFixed(2));
+        $('.dpp-nilai-lain-sum').text(dppNilaiLainSum.toFixed(2));
+        $('.ppnbm-sum').text(ppnbmSum.toFixed(2));
     }
 
     // Add first row on page load
@@ -448,7 +464,7 @@ $(document).ready(function() {
         updateTotals();
     });
 
-    $('#transactionTable').on('input', '.item-qty, .item-price, .item-discount, .item-vat-rate', function() {
+    $('#transactionTable').on('input', '.item-qty, .item-price', function() {
         calculateRow($(this).closest('tr'));
         updateTotals();
     });

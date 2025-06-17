@@ -47,7 +47,43 @@ class LaporanFakturController extends Controller
         $taxPeriodYear = now()->year;
         $transactionDate = now()->format('Y-m-d');
 
-        return view('laporanfaktur.create', compact('taxPeriodMonth', 'taxPeriodYear', 'transactionDate'));
+        $units = [
+            ['code' => 'UM.0003', 'name' => 'Kilogram'],
+            ['code' => 'UM.0004', 'name' => 'Gram'],
+            ['code' => 'UM.0005', 'name' => 'Karat'],
+            ['code' => 'UM.0001', 'name' => 'Metrik Ton'],
+            ['code' => 'UM.0002', 'name' => 'Wet Ton'],
+            ['code' => 'UM.0006', 'name' => 'Kiloliter'],
+            ['code' => 'UM.0007', 'name' => 'Liter'],
+            ['code' => 'UM.0008', 'name' => 'Barrel'],
+            ['code' => 'UM.0009', 'name' => 'MMBTU'],
+            ['code' => 'UM.0010', 'name' => 'Ampere'],
+            ['code' => 'UM.0011', 'name' => 'Sentimeter Kubik'],
+            ['code' => 'UM.0012', 'name' => 'Meter Persegi'],
+            ['code' => 'UM.0013', 'name' => 'Meter'],
+            ['code' => 'UM.0014', 'name' => 'Inches'],
+            ['code' => 'UM.0015', 'name' => 'Sentimeter'],
+            ['code' => 'UM.0016', 'name' => 'Yard'],
+            ['code' => 'UM.0017', 'name' => 'Lusin'],
+            ['code' => 'UM.0018', 'name' => 'Unit'],
+            ['code' => 'UM.0019', 'name' => 'Set'],
+            ['code' => 'UM.0020', 'name' => 'Lembar'],
+            ['code' => 'UM.0021', 'name' => 'Piece'],
+            ['code' => 'UM.0022', 'name' => 'Boks'],
+            ['code' => 'UM.0023', 'name' => 'Tahun'],
+            ['code' => 'UM.0024', 'name' => 'Bulan'],
+            ['code' => 'UM.0025', 'name' => 'Minggu'],
+            ['code' => 'UM.0026', 'name' => 'Hari'],
+            ['code' => 'UM.0027', 'name' => 'Jam'],
+            ['code' => 'UM.0028', 'name' => 'Menit'],
+            ['code' => 'UM.0029', 'name' => 'Persen'],
+            ['code' => 'UM.0030', 'name' => 'Kegiatan'],
+            ['code' => 'UM.0031', 'name' => 'Laporan'],
+            ['code' => 'UM.0032', 'name' => 'Bahan'],
+            ['code' => 'UM.0033', 'name' => 'Lainnya'],
+        ];
+
+        return view('laporanfaktur.create', compact('taxPeriodMonth', 'taxPeriodYear', 'transactionDate', 'units'));
     }
 
     /**
