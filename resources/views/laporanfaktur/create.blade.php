@@ -90,7 +90,7 @@
                                 <div class="row">
                                     <div class="col-md-3">
                                         <label for="npwpPenjual" class="form-label">NPWP Penjual <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="npwpPenjual" name="npwp_penjual" placeholder="0013575832046000" required>
+                                        <input type="text" class="form-control" id="npwpPenjual" name="npwp_penjual" placeholder="0013575832046000" required maxlength="16" minlength="16" pattern="[0-9]{16}" title="NPWP harus 16 digit angka">
                                     </div>
                                     <div class="col-md-3">
                                         <label for="referensi" class="form-label">Referensi</label>
@@ -117,7 +117,7 @@
                                 <div class="row mb-3">
                                     <div class="col-md-4">
                                         <label for="npwpPembeli" class="form-label">NPWP <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="npwpPembeli" name="npwp_pembeli" placeholder="0013575832046000" required>
+                                        <input type="text" class="form-control" id="npwpPembeli" name="npwp_pembeli" placeholder="0013575832046000" required maxlength="16" minlength="16" pattern="[0-9]{16}" title="NPWP harus 16 digit angka">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">ID</label>
