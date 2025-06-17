@@ -18,6 +18,7 @@ class DetailFaktur extends Model
         'nama_satuan_ukur',
         'harga_satuan',
         'jumlah_barang_jasa',
+        'total_harga',
         'total_diskon',
         'dpp',
         'dpp_nilai_lain',

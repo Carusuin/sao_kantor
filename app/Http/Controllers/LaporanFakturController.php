@@ -139,6 +139,9 @@ class LaporanFakturController extends Controller
             // Validasi dan simpan detail item
             if ($request->has('items')) {
                 foreach ($request->items as $index => $item) {
+                    $hargaSatuan = (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['harga_satuan']));
+                    $jumlahBarang = (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['jumlah_barang_jasa']));
+                    $totalHarga = $hargaSatuan * $jumlahBarang;
                     $detailData = [
                         'faktur_id' => $faktur->id,
                         'baris' => $index + 1,
@@ -146,8 +149,9 @@ class LaporanFakturController extends Controller
                         'kode_barang_jasa' => $item['kode_barang_jasa'],
                         'nama_barang_jasa' => $item['nama_barang_jasa'],
                         'nama_satuan_ukur' => $item['nama_satuan_ukur'],
-                        'harga_satuan' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['harga_satuan'])),
-                        'jumlah_barang_jasa' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['jumlah_barang_jasa'])),
+                        'harga_satuan' => $hargaSatuan,
+                        'jumlah_barang_jasa' => $jumlahBarang,
+                        'total_harga' => $totalHarga,
                         'total_diskon' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['total_diskon'] ?? 0)),
                         'dpp' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['dpp'] ?? 0)),
                         'dpp_nilai_lain' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['dpp_nilai_lain'] ?? 0)),
@@ -245,6 +249,9 @@ class LaporanFakturController extends Controller
             $laporanFaktur->details()->delete();
             if ($request->has('items')) {
                 foreach ($request->items as $index => $item) {
+                    $hargaSatuan = (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['harga_satuan']));
+                    $jumlahBarang = (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['jumlah_barang_jasa']));
+                    $totalHarga = $hargaSatuan * $jumlahBarang;
                     $detailData = [
                         'faktur_id' => $laporanFaktur->id,
                         'baris' => $index + 1,
@@ -252,8 +259,9 @@ class LaporanFakturController extends Controller
                         'kode_barang_jasa' => $item['kode_barang_jasa'],
                         'nama_barang_jasa' => $item['nama_barang_jasa'],
                         'nama_satuan_ukur' => $item['nama_satuan_ukur'],
-                        'harga_satuan' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['harga_satuan'])),
-                        'jumlah_barang_jasa' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['jumlah_barang_jasa'])),
+                        'harga_satuan' => $hargaSatuan,
+                        'jumlah_barang_jasa' => $jumlahBarang,
+                        'total_harga' => $totalHarga,
                         'total_diskon' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['total_diskon'] ?? 0)),
                         'dpp' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['dpp'] ?? 0)),
                         'dpp_nilai_lain' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['dpp_nilai_lain'] ?? 0)),

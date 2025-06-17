@@ -139,29 +139,29 @@ class EFakturXmlExportService
     {
         $goodService = $this->dom->createElement('GoodService');
         
-        // Determine Opt based on item type
-        $opt = $this->determineOptType($detail->nama_barang_jasa);
+        // OPT langsung dari kolom barang_jasa
+        $opt = $detail->barang_jasa;
         
         $this->addTextElement($goodService, 'Opt', $opt);
         $this->addTextElement($goodService, 'Code', $detail->kode_barang_jasa ?? '000000');
         $this->addTextElement($goodService, 'Name', $detail->nama_barang_jasa);
-        $this->addTextElement($goodService, 'Unit', $this->getUnitCode($detail->nama_satuan_ukur));
-        $this->addTextElement($goodService, 'Price', number_format($detail->harga_satuan, 2, '.', ''));
-        $this->addTextElement($goodService, 'Qty', number_format($detail->jumlah_barang_jasa, 2, '.', ''));
-        $this->addTextElement($goodService, 'TotalDiscount', number_format($detail->total_diskon ?? 0, 2, '.', ''));
+        $this->addTextElement($goodService, 'Unit', $detail->nama_satuan_ukur);
+        $this->addTextElement($goodService, 'Price', (int)$detail->harga_satuan);
+        $this->addTextElement($goodService, 'Qty', (int)$detail->jumlah_barang_jasa);
+        $this->addTextElement($goodService, 'TotalDiscount', (int)($detail->total_diskon ?? 0));
         
         // Calculate tax base
         $taxBase = $detail->harga_satuan * $detail->jumlah_barang_jasa - ($detail->total_diskon ?? 0);
-        $this->addTextElement($goodService, 'TaxBase', number_format($taxBase, 2, '.', ''));
+        $this->addTextElement($goodService, 'TaxBase', (int)$taxBase);
         
         // Calculate other tax base (before VAT)
         $otherTaxBase = round($taxBase / (1 + ($detail->tarif_ppn / 100)), 0);
-        $this->addTextElement($goodService, 'OtherTaxBase', number_format($otherTaxBase, 2, '.', ''));
+        $this->addTextElement($goodService, 'OtherTaxBase', (int)$otherTaxBase);
         
-        $this->addTextElement($goodService, 'VATRate', number_format($detail->tarif_ppn ?? 12, 2, '.', ''));
-        $this->addTextElement($goodService, 'VAT', number_format($detail->ppn ?? ($taxBase * 0.12), 2, '.', ''));
-        $this->addTextElement($goodService, 'STLGRate', number_format($detail->tarif_ppnbm ?? 0, 2, '.', ''));
-        $this->addTextElement($goodService, 'STLG', number_format($detail->ppnbm ?? 0, 2, '.', ''));
+        $this->addTextElement($goodService, 'VATRate', (int)($detail->tarif_ppn ?? 12));
+        $this->addTextElement($goodService, 'VAT', (int)($detail->ppn ?? ($taxBase * 0.12)));
+        $this->addTextElement($goodService, 'STLGRate', (int)($detail->tarif_ppnbm ?? 0));
+        $this->addTextElement($goodService, 'STLG', (int)($detail->ppnbm ?? 0));
         
         return $goodService;
     }
