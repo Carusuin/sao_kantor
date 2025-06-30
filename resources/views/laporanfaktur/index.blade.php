@@ -78,9 +78,6 @@
                                                     <a href="{{ route('efaktur.export.single', $faktur->id) }}" class="btn btn-success btn-sm" title="Export XML">
                                                         <i class="fas fa-file-export"></i> XML
                                                     </a>
-                                                    <a href="{{ route('laporan_faktur.create', ['id' => $faktur->id]) }}" class="btn btn-warning btn-sm" title="Isi / Lengkapi Data">
-                                                        <i class="fas fa-edit"></i> Isi
-                                                    </a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -354,10 +351,11 @@ document.getElementById('fakturTableBody').addEventListener('click', function(e)
         e.target.closest('tr').remove();
         updateAutoNumbers();
     }
-    if (e.target.classList.contains('hapusDraftBtn')) {
-        const draftId = e.target.closest('button').getAttribute('data-draft-id');
+    const btn = e.target.closest('.hapusDraftBtn');
+    if (btn) {
+        const draftId = btn.getAttribute('data-draft-id');
         sessionStorage.removeItem(draftId);
-        e.target.closest('tr').remove();
+        btn.closest('tr').remove();
         updateAutoNumbers();
     }
     if (e.target.classList.contains('simpanBarisBtn')) {
@@ -429,6 +427,7 @@ document.getElementById('fakturTableBody').addEventListener('click', function(e)
                     <a href="{{ route('laporan_faktur.create') }}?temp_id=${tempId}" class="btn btn-warning btn-sm" title="Isi / Lengkapi Data">
                         <i class="fas fa-edit"></i> Isi
                     </a>
+                    <button type="button" class="btn btn-danger btn-sm hapusDraftBtn" data-draft-id="${tempId}"><i class="fas fa-trash"></i></button>
                 </div>
             </td>
         `;
