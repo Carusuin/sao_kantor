@@ -64,8 +64,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [LaporanFakturController::class, 'index'])->name('index');
         Route::get('/create', [LaporanFakturController::class, 'create'])->name('create');
         Route::post('/', [LaporanFakturController::class, 'store'])->name('store');
-        Route::get('/create-header', [LaporanFakturController::class, 'createHeader'])->name('create_header');
-        Route::post('/store-header', [LaporanFakturController::class, 'storeHeader'])->name('store_header');
         Route::get('/{laporanFaktur}', [LaporanFakturController::class, 'show'])->name('show');
     });
 

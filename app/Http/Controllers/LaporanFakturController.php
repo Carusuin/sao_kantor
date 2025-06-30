@@ -389,15 +389,4 @@ class LaporanFakturController extends Controller
 
         return $xml;
     }
-
-    public function createHeader()
-    {
-        return view('laporanfaktur.create_header_only');
-    }
-
-    public function storeHeader(Request $request)
-    {
-        // Implementasi penyimpanan header faktur di sini (dummy)
-        return redirect()->route('laporan_faktur.index')->with('success', 'Header faktur berhasil disimpan (dummy)');
-    }
 }

@@ -17,10 +17,6 @@
                             <i class="fas fa-plus me-1"></i>
                             Tambah Laporan E-Faktur
                         </a>
-                        <a href="{{ route('laporan_faktur.create_header') }}" class="btn btn-warning">
-                            <i class="fas fa-plus me-1"></i>
-                            Tambah Header Faktur Saja
-                        </a>
                         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exportModal">
                             <i class="fas fa-file-export me-1"></i>
                             Export XML
