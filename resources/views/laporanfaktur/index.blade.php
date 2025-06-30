@@ -40,8 +40,9 @@
                                         <th style="width: 40px; text-align: center;">
                                             <input type="checkbox" id="selectAllCheckbox" onclick="toggleAllCheckboxes(this)">
                                         </th>
+                                        <th>No</th>
                                         <th>Tanggal Faktur</th>
-                                        <th>NPWP/NIK Pembeli</th>
+                                        <th>Identitas Pembeli</th>
                                         <th>Nama Pembeli</th>
                                         <th>Alamat</th>
                                         <th>Email</th>
@@ -55,8 +56,9 @@
                                             <td style="text-align: center;">
                                                 <input type="checkbox" class="rowCheckbox" name="selected_fakturs[]" value="{{ $faktur->id }}">
                                             </td>
+                                            <td>{{ $loop->iteration }}</td>
                                             <td>{{ $faktur->tanggal_faktur->format('d-m-Y') }}</td>
-                                            <td>{{ $faktur->npwp_nik_pembeli }}</td>
+                                            <td>{{ $faktur->jenis_id_pembeli }} {{ $faktur->npwp_nik_pembeli }}</td>
                                             <td>{{ $faktur->nama_pembeli }}</td>
                                             <td>{{ $faktur->alamat_pembeli }}</td>
                                             <td>{{ $faktur->email_pembeli }}</td>
