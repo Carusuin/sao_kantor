@@ -37,26 +37,30 @@
                             <table class="table table-bordered table-striped">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th>ID</th>
+                                        <th style="width: 40px; text-align: center;">
+                                            <input type="checkbox" id="selectAllCheckbox" onclick="toggleAllCheckboxes(this)">
+                                        </th>
                                         <th>Tanggal Faktur</th>
-                                        <th>Jenis Faktur</th>
-                                        <th>Kode Transaksi</th>
                                         <th>NPWP/NIK Pembeli</th>
                                         <th>Nama Pembeli</th>
-                                        <th>Nomor Faktur</th>
+                                        <th>Alamat</th>
+                                        <th>Email</th>
+                                        <th>No Invoice/No Dokumen/No Referensi/No Nota</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($fakturs as $faktur)
                                         <tr>
-                                            <td>{{ $faktur->id }}</td>
+                                            <td style="text-align: center;">
+                                                <input type="checkbox" class="rowCheckbox" name="selected_fakturs[]" value="{{ $faktur->id }}">
+                                            </td>
                                             <td>{{ $faktur->tanggal_faktur->format('d-m-Y') }}</td>
-                                            <td>{{ $faktur->jenis_faktur }}</td>
-                                            <td>{{ $faktur->kode_transaksi }}</td>
                                             <td>{{ $faktur->npwp_nik_pembeli }}</td>
                                             <td>{{ $faktur->nama_pembeli }}</td>
-                                            <td>{{ $faktur->nomor_faktur }}</td>
+                                            <td>{{ $faktur->alamat_pembeli }}</td>
+                                            <td>{{ $faktur->email_pembeli }}</td>
+                                            <td>{{ $faktur->referensi }}</td>
                                             <td>
                                                 <div class="btn-group">
                                                     <a href="{{ route('laporan_faktur.show', $faktur->id) }}" class="btn btn-info btn-sm" title="Lihat Detail">
@@ -224,6 +228,11 @@ function copyXMLToClipboard() {
         console.error('Error copying to clipboard:', err);
         alert('Failed to copy to clipboard');
     });
+}
+
+function toggleAllCheckboxes(source) {
+    const checkboxes = document.querySelectorAll('.rowCheckbox');
+    checkboxes.forEach(cb => cb.checked = source.checked);
 }
 </script>
 @endpush 
