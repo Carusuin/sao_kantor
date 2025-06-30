@@ -17,6 +17,9 @@
                 <div class="card-body">
                     <form action="{{ route('laporan_faktur.store') }}" method="POST" id="createEFakturForm">
                         @csrf
+                        @if(isset($faktur) && $faktur)
+                            <input type="hidden" name="id" value="{{ $faktur->id }}">
+                        @endif
                         
                         <!-- Dokumen Transaksi Section -->
                         <div class="card mb-4">
@@ -27,13 +30,13 @@
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="uangMuka" name="uang_muka" value="1">
+                                            <input class="form-check-input" type="checkbox" id="uangMuka" name="uang_muka" value="1" @if(old('uang_muka', isset($faktur) ? $faktur->uang_muka : false)) checked @endif>
                                             <label class="form-check-label" for="uangMuka">Uang Muka</label>
                                 </div>
                             </div>
                                     <div class="col-md-2">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="pelunasan" name="pelunasan" value="1">
+                                            <input class="form-check-input" type="checkbox" id="pelunasan" name="pelunasan" value="1" @if(old('pelunasan', isset($faktur) ? $faktur->pelunasan : false)) checked @endif>
                                             <label class="form-check-label" for="pelunasan">Pelunasan</label>
                                 </div>
                             </div>
@@ -43,7 +46,7 @@
                                             placeholder="Nomor Faktur" required
                                             pattern="[A-Z0-9.-]+" 
                                             title="Nomor faktur hanya boleh berisi huruf kapital, angka, titik, dan tanda hubung"
-                                            maxlength="255">
+                                            maxlength="255" value="{{ old('nomor_faktur', isset($faktur) ? $faktur->nomor_faktur : '') }}">
                                         <div class="invalid-feedback">
                                             Nomor faktur harus diisi dan hanya boleh berisi huruf kapital, angka, titik, dan tanda hubung
                                         </div>
@@ -52,26 +55,26 @@
                                         <label for="kodeTransaksi" class="form-label">Kode Transaksi <span class="text-danger">*</span></label>
                                         <select class="form-select" id="kodeTransaksi" name="kode_transaksi" required>
                                             <option value="">Pilih Kode Transaksi</option>
-                                            <option value="01">01 - Penyerahan BKP/JKP</option>
-                                            <option value="02">02 - Penyerahan BKP/JKP kepada Pemungut PPN</option>
-                                            <option value="03">03 - Penyerahan BKP/JKP kepada Instansi Pemerintah</option>
-                                            <option value="04">04 - DPP Tidak Dipungut</option>
-                                            <option value="06">06 - DPP Dibebaskan</option>
-                                            <option value="07">07 - Penyerahan yang PPN-nya Ditanggung Pemerintah</option>
-                                            <option value="08">08 - Penyerahan yang PPN-nya Tidak Dipungut</option>
+                                            <option value="01" @if(old('kode_transaksi', isset($faktur) ? $faktur->kode_transaksi : '') == '01') selected @endif>01 - Penyerahan BKP/JKP</option>
+                                            <option value="02" @if(old('kode_transaksi', isset($faktur) ? $faktur->kode_transaksi : '') == '02') selected @endif>02 - Penyerahan BKP/JKP kepada Pemungut PPN</option>
+                                            <option value="03" @if(old('kode_transaksi', isset($faktur) ? $faktur->kode_transaksi : '') == '03') selected @endif>03 - Penyerahan BKP/JKP kepada Instansi Pemerintah</option>
+                                            <option value="04" @if(old('kode_transaksi', isset($faktur) ? $faktur->kode_transaksi : '') == '04') selected @endif>04 - DPP Tidak Dipungut</option>
+                                            <option value="06" @if(old('kode_transaksi', isset($faktur) ? $faktur->kode_transaksi : '') == '06') selected @endif>06 - DPP Dibebaskan</option>
+                                            <option value="07" @if(old('kode_transaksi', isset($faktur) ? $faktur->kode_transaksi : '') == '07') selected @endif>07 - Penyerahan yang PPN-nya Ditanggung Pemerintah</option>
+                                            <option value="08" @if(old('kode_transaksi', isset($faktur) ? $faktur->kode_transaksi : '') == '08') selected @endif>08 - Penyerahan yang PPN-nya Tidak Dipungut</option>
                                         </select>
                         </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="tanggalFaktur" class="form-label">Tanggal Faktur <span class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" id="tanggalFaktur" name="tanggal_faktur" value="{{ now()->format('Y-m-d') }}" required>
+                                        <input type="date" class="form-control" id="tanggalFaktur" name="tanggal_faktur" value="{{ old('tanggal_faktur', isset($faktur) ? $faktur->tanggal_faktur->format('Y-m-d') : now()->format('Y-m-d')) }}" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label for="jenisFaktur" class="form-label">Jenis Faktur <span class="text-danger">*</span></label>
                                         <select class="form-select" id="jenisFaktur" name="jenis_faktur" required>
-                                            <option value="Normal">Normal</option>
-                                            <option value="Pengganti">Pengganti</option>
+                                            <option value="Normal" @if(old('jenis_faktur', isset($faktur) ? $faktur->jenis_faktur : '') == 'Normal') selected @endif>Normal</option>
+                                            <option value="Pengganti" @if(old('jenis_faktur', isset($faktur) ? $faktur->jenis_faktur : '') == 'Pengganti') selected @endif>Pengganti</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
@@ -84,25 +87,25 @@
                                     </div>
                                     <div class="col-md-3">
                                         <label for="tahunPajak" class="form-label">Tahun <span class="text-danger">*</span></label>
-                                        <input type="number" class="form-control" id="tahunPajak" name="tahun_pajak" value="{{ date('Y') }}" required>
+                                        <input type="number" class="form-control" id="tahunPajak" name="tahun_pajak" value="{{ old('tahun_pajak', isset($faktur) ? $faktur->tahun_pajak : date('Y')) }}" required>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-3">
                                         <label for="npwpPenjual" class="form-label">NPWP Penjual <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="npwpPenjual" name="npwp_penjual" placeholder="0013575832046000" required maxlength="16" minlength="16" pattern="[0-9]{16}" title="NPWP harus 16 digit angka">
+                                        <input type="text" class="form-control" id="npwpPenjual" name="npwp_penjual" placeholder="0013575832046000" required maxlength="16" minlength="16" pattern="[0-9]{16}" title="NPWP harus 16 digit angka" value="{{ old('npwp_penjual', isset($faktur) ? $faktur->npwp_penjual : '') }}">
                                     </div>
                                     <div class="col-md-3">
                                         <label for="referensi" class="form-label">Referensi</label>
-                                        <input type="text" class="form-control" id="referensi" name="referensi" readonly>
+                                        <input type="text" class="form-control" id="referensi" name="referensi" readonly value="{{ old('referensi', isset($faktur) ? $faktur->referensi : '') }}">
                                     </div>
                                     <div class="col-md-3">
                                         <label for="alamatDokumen" class="form-label">Alamat <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="alamatDokumen" name="alamat_dokumen" placeholder="JL. HOS COKROAMINOTO N..." required>
+                                        <input type="text" class="form-control" id="alamatDokumen" name="alamat_dokumen" placeholder="JL. HOS COKROAMINOTO N..." required value="{{ old('alamat_dokumen', isset($faktur) ? $faktur->alamat_penjual : '') }}">
                                     </div>
                                     <div class="col-md-3">
                                         <label for="idTKUdokumen" class="form-label">IDTKU <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="idTKUdokumen" name="id_tku_dokumen" placeholder="000000" readonly required>
+                                        <input type="text" class="form-control" id="idTKUdokumen" name="id_tku_dokumen" placeholder="000000" readonly required value="{{ old('id_tku_dokumen', isset($faktur) ? $faktur->id_tku_penjual : '') }}">
                                     </div>
                                 </div>
                             </div>
@@ -117,25 +120,25 @@
                                 <div class="row mb-3">
                                     <div class="col-md-4">
                                         <label for="npwpPembeli" class="form-label">NPWP <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="npwpPembeli" name="npwp_pembeli" placeholder="0013575832046000" required maxlength="16" minlength="16" pattern="[0-9]{16}" title="NPWP harus 16 digit angka">
+                                        <input type="text" class="form-control" id="npwpPembeli" name="npwp_pembeli" placeholder="0013575832046000" required maxlength="16" minlength="16" pattern="[0-9]{16}" title="NPWP harus 16 digit angka" value="{{ old('npwp_pembeli', isset($faktur) ? $faktur->npwp_nik_pembeli : '') }}">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">ID</label>
                                         <div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="buyer_id_type" id="idNpwp" value="NPWP" checked>
+                                                <input class="form-check-input" type="radio" name="buyer_id_type" id="idNpwp" value="NPWP" @if(old('buyer_id_type', isset($faktur) ? $faktur->jenis_id_pembeli : 'NPWP') == 'NPWP') checked @endif>
                                                 <label class="form-check-label" for="idNpwp">NPWP</label>
                                             </div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="buyer_id_type" id="idPaspor" value="Paspor">
+                                                <input class="form-check-input" type="radio" name="buyer_id_type" id="idPaspor" value="Paspor" @if(old('buyer_id_type', isset($faktur) ? $faktur->jenis_id_pembeli : '') == 'Paspor') checked @endif>
                                                 <label class="form-check-label" for="idPaspor">Paspor</label>
                                             </div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="buyer_id_type" id="idNik" value="NIK">
+                                                <input class="form-check-input" type="radio" name="buyer_id_type" id="idNik" value="NIK" @if(old('buyer_id_type', isset($faktur) ? $faktur->jenis_id_pembeli : '') == 'NIK') checked @endif>
                                                 <label class="form-check-label" for="idNik">NIK</label>
                                             </div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="buyer_id_type" id="idLain" value="Lainnya">
+                                                <input class="form-check-input" type="radio" name="buyer_id_type" id="idLain" value="Lainnya" @if(old('buyer_id_type', isset($faktur) ? $faktur->jenis_id_pembeli : '') == 'Lainnya') checked @endif>
                                                 <label class="form-check-label" for="idLain">Lainnya</label>
                                 </div>
                             </div>
@@ -143,42 +146,42 @@
                                     <div class="col-md-4">
                                         <label for="negaraPembeli" class="form-label">Negara</label>
                                         <select class="form-select" id="negaraPembeli" name="negara_pembeli">
-                                            <option value="IDN" selected>Indonesia</option>
-                                            <option value="SGP">Singapore</option>
-                                            <option value="MYS">Malaysia</option>
-                                            <option value="THA">Thailand</option>
-                                            <option value="VNM">Vietnam</option>
-                                            <option value="PHL">Philippines</option>
-                                            <option value="BRN">Brunei</option>
-                                            <option value="KHM">Cambodia</option>
-                                            <option value="LAO">Laos</option>
-                                            <option value="MMR">Myanmar</option>
-                                            <option value="TLS">East Timor</option>
+                                            <option value="IDN" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : 'IDN') == 'IDN') selected @endif>Indonesia</option>
+                                            <option value="SGP" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : '') == 'SGP') selected @endif>Singapore</option>
+                                            <option value="MYS" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : '') == 'MYS') selected @endif>Malaysia</option>
+                                            <option value="THA" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : '') == 'THA') selected @endif>Thailand</option>
+                                            <option value="VNM" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : '') == 'VNM') selected @endif>Vietnam</option>
+                                            <option value="PHL" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : '') == 'PHL') selected @endif>Philippines</option>
+                                            <option value="BRN" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : '') == 'BRN') selected @endif>Brunei</option>
+                                            <option value="KHM" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : '') == 'KHM') selected @endif>Cambodia</option>
+                                            <option value="LAO" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : '') == 'LAO') selected @endif>Laos</option>
+                                            <option value="MMR" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : '') == 'MMR') selected @endif>Myanmar</option>
+                                            <option value="TLS" @if(old('negara_pembeli', isset($faktur) ? $faktur->negara_pembeli : '') == 'TLS') selected @endif>East Timor</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-4">
                                         <label for="nomorDokumenPembeli" class="form-label">Nomor Dokumen</label>
-                                        <input type="text" class="form-control" id="nomorDokumenPembeli" name="nomor_dokumen_pembeli">
+                                        <input type="text" class="form-control" id="nomorDokumenPembeli" name="nomor_dokumen_pembeli" value="{{ old('nomor_dokumen_pembeli', isset($faktur) ? $faktur->nomor_dokumen_pembeli : '') }}">
                             </div>
                                     <div class="col-md-4">
                                         <label for="namaPembeli" class="form-label">Nama <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="namaPembeli" name="nama_pembeli" placeholder="SERAS*********" required>
+                                        <input type="text" class="form-control" id="namaPembeli" name="nama_pembeli" placeholder="SERAS*********" required value="{{ old('nama_pembeli', isset($faktur) ? $faktur->nama_pembeli : '') }}">
                         </div>
                                     <div class="col-md-4">
                                         <label for="alamatPembeli" class="form-label">Alamat <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="alamatPembeli" name="alamat_pembeli" placeholder="JL. MITRA SUNTER BOULEVARD B..." required>
+                                        <input type="text" class="form-control" id="alamatPembeli" name="alamat_pembeli" placeholder="JL. MITRA SUNTER BOULEVARD B..." required value="{{ old('alamat_pembeli', isset($faktur) ? $faktur->alamat_pembeli : '') }}">
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <label for="idTKUPembeli" class="form-label">IDTKU <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="idTKUPembeli" name="id_tku_pembeli" placeholder="000000" readonly required>
+                                        <input type="text" class="form-control" id="idTKUPembeli" name="id_tku_pembeli" placeholder="000000" readonly required value="{{ old('id_tku_pembeli', isset($faktur) ? $faktur->id_tku_pembeli : '') }}">
                             </div>
                                     <div class="col-md-4">
                                         <label for="emailPembeli" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="emailPembeli" name="email_pembeli" placeholder="taxsera.ho@sera.astra.co.id">
+                                        <input type="email" class="form-control" id="emailPembeli" name="email_pembeli" placeholder="taxsera.ho@sera.astra.co.id" value="{{ old('email_pembeli', isset($faktur) ? $faktur->email_pembeli : '') }}">
                                     </div>
                                 </div>
                             </div>
@@ -294,6 +297,27 @@
 <script>
 $(document).ready(function() {
     let rowCounter = 0;
+
+    // Autofill dari sessionStorage jika ada temp_id di URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tempId = urlParams.get('temp_id');
+    if (tempId && sessionStorage.getItem(tempId)) {
+        try {
+            const data = JSON.parse(sessionStorage.getItem(tempId));
+            if (data.tanggal_faktur) $('#tanggalFaktur').val(data.tanggal_faktur);
+            if (data.jenis_id_pembeli) {
+                $("input[name='buyer_id_type'][value='"+data.jenis_id_pembeli+"']").prop('checked', true);
+            }
+            if (data.npwp_nik_pembeli) $('#npwpPembeli').val(data.npwp_nik_pembeli);
+            if (data.nama_pembeli) $('#namaPembeli').val(data.nama_pembeli);
+            if (data.alamat_pembeli) $('#alamatPembeli').val(data.alamat_pembeli);
+            if (data.email_pembeli) $('#emailPembeli').val(data.email_pembeli);
+            if (data.referensi) {
+                $('#referensi').prop('readonly', false).val(data.referensi).prop('readonly', true);
+                $('#nomorDokumenPembeli').val(data.referensi);
+            }
+        } catch(e) {}
+    }
 
     // Function to generate IDTKU from NPWP/TIN
     function generateIDTKU(npwp) {

@@ -41,7 +41,7 @@ class LaporanFakturController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         $taxPeriodMonth = now()->month;
         $taxPeriodYear = now()->year;
@@ -83,7 +83,12 @@ class LaporanFakturController extends Controller
             ['code' => 'UM.0033', 'name' => 'Lainnya'],
         ];
 
-        return view('laporanfaktur.create', compact('taxPeriodMonth', 'taxPeriodYear', 'transactionDate', 'units'));
+        $faktur = null;
+        if ($request->has('id')) {
+            $faktur = \App\Models\Faktur::find($request->id);
+        }
+
+        return view('laporanfaktur.create', compact('taxPeriodMonth', 'taxPeriodYear', 'transactionDate', 'units', 'faktur'));
     }
 
     /**
@@ -114,30 +119,57 @@ class LaporanFakturController extends Controller
                 'nomor_faktur' => 'required|string|max:255|regex:/^[A-Z0-9.-]+$/',
             ]);
 
-            // Buat record faktur
-            $faktur = Faktur::create([
-                'tanggal_faktur' => $fakturData['tanggal_faktur'],
-                'jenis_faktur' => $fakturData['jenis_faktur'],
-                'kode_transaksi' => $fakturData['kode_transaksi'],
-                'referensi' => $fakturData['referensi'],
-                'alamat_penjual' => $fakturData['alamat_dokumen'],
-                'id_tku_penjual' => $fakturData['id_tku_dokumen'],
-                'npwp_penjual' => $fakturData['npwp_penjual'],
-                'npwp_nik_pembeli' => $fakturData['npwp_pembeli'],
-                'jenis_id_pembeli' => $fakturData['buyer_id_type'],
-                'negara_pembeli' => $fakturData['negara_pembeli'],
-                'nomor_dokumen_pembeli' => $fakturData['nomor_dokumen_pembeli'],
-                'nama_pembeli' => $fakturData['nama_pembeli'],
-                'alamat_pembeli' => $fakturData['alamat_pembeli'],
-                'email_pembeli' => $fakturData['email_pembeli'],
-                'id_tku_pembeli' => $fakturData['id_tku_pembeli'],
-                'uang_muka' => $request->boolean('uang_muka'),
-                'pelunasan' => $request->boolean('pelunasan'),
-                'nomor_faktur' => $request->input('nomor_faktur'),
-            ]);
+            // Jika ada id, update, jika tidak insert baru
+            if ($request->has('id') && $request->id) {
+                $faktur = \App\Models\Faktur::findOrFail($request->id);
+                $faktur->update([
+                    'tanggal_faktur' => $fakturData['tanggal_faktur'],
+                    'jenis_faktur' => $fakturData['jenis_faktur'],
+                    'kode_transaksi' => $fakturData['kode_transaksi'],
+                    'referensi' => $fakturData['referensi'],
+                    'alamat_penjual' => $fakturData['alamat_dokumen'],
+                    'id_tku_penjual' => $fakturData['id_tku_dokumen'],
+                    'npwp_penjual' => $fakturData['npwp_penjual'],
+                    'npwp_nik_pembeli' => $fakturData['npwp_pembeli'],
+                    'jenis_id_pembeli' => $fakturData['buyer_id_type'],
+                    'negara_pembeli' => $fakturData['negara_pembeli'],
+                    'nomor_dokumen_pembeli' => $fakturData['nomor_dokumen_pembeli'],
+                    'nama_pembeli' => $fakturData['nama_pembeli'],
+                    'alamat_pembeli' => $fakturData['alamat_pembeli'],
+                    'email_pembeli' => $fakturData['email_pembeli'],
+                    'id_tku_pembeli' => $fakturData['id_tku_pembeli'],
+                    'uang_muka' => $request->boolean('uang_muka'),
+                    'pelunasan' => $request->boolean('pelunasan'),
+                    'nomor_faktur' => $request->input('nomor_faktur'),
+                ]);
+            } else {
+                $faktur = \App\Models\Faktur::create([
+                    'tanggal_faktur' => $fakturData['tanggal_faktur'],
+                    'jenis_faktur' => $fakturData['jenis_faktur'],
+                    'kode_transaksi' => $fakturData['kode_transaksi'],
+                    'referensi' => $fakturData['referensi'],
+                    'alamat_penjual' => $fakturData['alamat_dokumen'],
+                    'id_tku_penjual' => $fakturData['id_tku_dokumen'],
+                    'npwp_penjual' => $fakturData['npwp_penjual'],
+                    'npwp_nik_pembeli' => $fakturData['npwp_pembeli'],
+                    'jenis_id_pembeli' => $fakturData['buyer_id_type'],
+                    'negara_pembeli' => $fakturData['negara_pembeli'],
+                    'nomor_dokumen_pembeli' => $fakturData['nomor_dokumen_pembeli'],
+                    'nama_pembeli' => $fakturData['nama_pembeli'],
+                    'alamat_pembeli' => $fakturData['alamat_pembeli'],
+                    'email_pembeli' => $fakturData['email_pembeli'],
+                    'id_tku_pembeli' => $fakturData['id_tku_pembeli'],
+                    'uang_muka' => $request->boolean('uang_muka'),
+                    'pelunasan' => $request->boolean('pelunasan'),
+                    'nomor_faktur' => $request->input('nomor_faktur'),
+                ]);
+            }
 
             // Validasi dan simpan detail item
             if ($request->has('items')) {
+                if (isset($faktur)) {
+                    $faktur->details()->delete();
+                }
                 foreach ($request->items as $index => $item) {
                     $hargaSatuan = (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['harga_satuan']));
                     $jumlahBarang = (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['jumlah_barang_jasa']));
@@ -160,7 +192,7 @@ class LaporanFakturController extends Controller
                         'tarif_ppnbm' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['tarif_ppnbm'] ?? 0)),
                         'ppnbm' => (int) preg_replace('/[.,].*/', '', str_replace(',', '', $item['ppnbm'] ?? 0)),
                     ];
-                    DetailFaktur::create($detailData);
+                    \App\Models\DetailFaktur::create($detailData);
                 }
             }
 

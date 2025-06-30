@@ -2,6 +2,10 @@
 
 @section('title', 'Laporan E-Faktur')
 
+@push('head')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
@@ -13,6 +17,9 @@
                         Daftar Laporan E-Faktur
                     </h3>
                     <div class="btn-group">
+                        <button type="button" class="btn btn-success" id="addRowBtn">
+                            <i class="fas fa-plus me-1"></i> Tambah Baris
+                        </button>
                         <a href="{{ route('laporan_faktur.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus me-1"></i>
                             Tambah Laporan E-Faktur
@@ -50,7 +57,7 @@
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="fakturTableBody">
                                     @foreach($fakturs as $faktur)
                                         <tr>
                                             <td style="text-align: center;">
@@ -70,6 +77,9 @@
                                                     </a>
                                                     <a href="{{ route('efaktur.export.single', $faktur->id) }}" class="btn btn-success btn-sm" title="Export XML">
                                                         <i class="fas fa-file-export"></i> XML
+                                                    </a>
+                                                    <a href="{{ route('laporan_faktur.create', ['id' => $faktur->id]) }}" class="btn btn-warning btn-sm" title="Isi / Lengkapi Data">
+                                                        <i class="fas fa-edit"></i> Isi
                                                     </a>
                                                 </div>
                                             </td>
@@ -236,5 +246,195 @@ function toggleAllCheckboxes(source) {
     const checkboxes = document.querySelectorAll('.rowCheckbox');
     checkboxes.forEach(cb => cb.checked = source.checked);
 }
+
+let fakturFormRowCount = 0;
+
+function getFormRowHtml(rowNum) {
+    return `
+    <tr class="faktur-form-row">
+        <td></td>
+        <td class="auto-number"></td>
+        <td><input type="date" class="form-control" name="tanggal_faktur[]"></td>
+        <td>
+            <select class="form-select identitas-type" name="jenis_id_pembeli[]">
+                <option value="NPWP">NPWP</option>
+                <option value="NIK">NIK</option>
+                <option value="Passport">Passport</option>
+                <option value="Lainnya">Lainnya</option>
+            </select>
+            <input type="text" class="form-control mt-1 identitas-value" name="npwp_nik_pembeli[]" placeholder="Nomor Identitas">
+            <div class="invalid-feedback"></div>
+        </td>
+        <td><input type="text" class="form-control" name="nama_pembeli[]"></td>
+        <td><input type="text" class="form-control" name="alamat_pembeli[]"></td>
+        <td><input type="email" class="form-control" name="email_pembeli[]"></td>
+        <td><input type="text" class="form-control" name="referensi[]"></td>
+        <td>
+            <button type="button" class="btn btn-success btn-sm simpanBarisBtn">Simpan</button>
+            <button type="button" class="btn btn-danger btn-sm hapusBarisBtn">Hapus</button>
+        </td>
+    </tr>
+    `;
+}
+
+function updateAutoNumbers() {
+    let rows = document.querySelectorAll('#fakturTableBody tr');
+    let num = 1;
+    rows.forEach(row => {
+        let autoNum = row.querySelector('.auto-number');
+        if (autoNum) {
+            autoNum.textContent = num++;
+        } else if (row.querySelector('td:nth-child(2)')) {
+            row.querySelector('td:nth-child(2)').textContent = num++;
+        }
+    });
+}
+
+document.getElementById('addRowBtn').addEventListener('click', function() {
+    fakturFormRowCount++;
+    let tbody = document.getElementById('fakturTableBody');
+    tbody.insertAdjacentHTML('afterbegin', getFormRowHtml(fakturFormRowCount));
+    updateAutoNumbers();
+});
+
+function getDrafts() {
+    const drafts = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key.startsWith('faktur_temp_')) {
+            try {
+                const data = JSON.parse(sessionStorage.getItem(key));
+                if (data) drafts.push(data);
+            } catch(e) {}
+        }
+    }
+    // Urutkan berdasarkan waktu pembuatan (id mengandung timestamp)
+    drafts.sort((a, b) => (a.id > b.id ? -1 : 1));
+    return drafts;
+}
+
+function renderDraftRow(draft) {
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td></td>
+        <td class="auto-number"></td>
+        <td>${draft.tanggal_faktur ? draft.tanggal_faktur.split('-').reverse().join('-') : ''}</td>
+        <td>${draft.jenis_id_pembeli || ''} ${draft.npwp_nik_pembeli || ''}</td>
+        <td>${draft.nama_pembeli || ''}</td>
+        <td>${draft.alamat_pembeli || ''}</td>
+        <td>${draft.email_pembeli || ''}</td>
+        <td>${draft.referensi || ''}</td>
+        <td>
+            <div class="btn-group">
+                <a href="{{ route('laporan_faktur.create') }}?temp_id=${draft.id}" class="btn btn-warning btn-sm" title="Isi / Lengkapi Data">
+                    <i class="fas fa-edit"></i> Isi
+                </a>
+                <button type="button" class="btn btn-danger btn-sm hapusDraftBtn" data-draft-id="${draft.id}"><i class="fas fa-trash"></i></button>
+            </div>
+        </td>
+    `;
+    return newRow;
+}
+
+function renderAllDrafts() {
+    const tbody = document.getElementById('fakturTableBody');
+    const drafts = getDrafts();
+    drafts.forEach(draft => {
+        tbody.insertBefore(renderDraftRow(draft), tbody.firstChild);
+    });
+    updateAutoNumbers();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderAllDrafts();
+});
+
+document.getElementById('fakturTableBody').addEventListener('click', function(e) {
+    if (e.target.classList.contains('hapusBarisBtn')) {
+        e.target.closest('tr').remove();
+        updateAutoNumbers();
+    }
+    if (e.target.classList.contains('hapusDraftBtn')) {
+        const draftId = e.target.closest('button').getAttribute('data-draft-id');
+        sessionStorage.removeItem(draftId);
+        e.target.closest('tr').remove();
+        updateAutoNumbers();
+    }
+    if (e.target.classList.contains('simpanBarisBtn')) {
+        const row = e.target.closest('tr');
+        // Ambil data dari input
+        const tanggal_faktur = row.querySelector('input[name="tanggal_faktur[]"]').value;
+        const jenis_id_pembeli = row.querySelector('select[name="jenis_id_pembeli[]"]').value;
+        const npwp_nik_pembeli = row.querySelector('input[name="npwp_nik_pembeli[]"]').value;
+        const nama_pembeli = row.querySelector('input[name="nama_pembeli[]"]').value;
+        const alamat_pembeli = row.querySelector('input[name="alamat_pembeli[]"]').value;
+        const email_pembeli = row.querySelector('input[name="email_pembeli[]"]').value;
+        const referensi = row.querySelector('input[name="referensi[]"]').value;
+
+        // Validasi sederhana (bisa dikembangkan sesuai kebutuhan)
+        let valid = true;
+        let errorMsg = '';
+        if (!tanggal_faktur) { valid = false; errorMsg = 'Tanggal wajib diisi'; }
+        if (!jenis_id_pembeli) { valid = false; errorMsg = 'Jenis identitas wajib dipilih'; }
+        if (!npwp_nik_pembeli) { valid = false; errorMsg = 'Nomor identitas wajib diisi'; }
+        if (!nama_pembeli) { valid = false; errorMsg = 'Nama pembeli wajib diisi'; }
+        if (!alamat_pembeli) { valid = false; errorMsg = 'Alamat wajib diisi'; }
+        // Email opsional, validasi jika diisi
+        if (email_pembeli && !/^\S+@\S+\.\S+$/.test(email_pembeli)) { valid = false; errorMsg = 'Format email tidak valid'; }
+
+        // Validasi khusus identitas
+        if (jenis_id_pembeli === 'NPWP' && !/^\d{16}$/.test(npwp_nik_pembeli)) { valid = false; errorMsg = 'NPWP harus 16 digit angka'; }
+        if (jenis_id_pembeli === 'NIK' && !/^\d{16}$/.test(npwp_nik_pembeli)) { valid = false; errorMsg = 'NIK harus 16 digit angka'; }
+        if ((jenis_id_pembeli === 'Passport' || jenis_id_pembeli === 'Lainnya') && npwp_nik_pembeli.length > 20) { valid = false; errorMsg = 'Maksimal 20 karakter'; }
+
+        // Reset error
+        row.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        row.querySelectorAll('input, select').forEach(el => el.classList.remove('is-invalid'));
+
+        if (!valid) {
+            // Tampilkan error di bawah field identitas
+            row.querySelector('.identitas-value').classList.add('is-invalid');
+            row.querySelector('.invalid-feedback').textContent = errorMsg;
+            return;
+        }
+
+        // Simpan data ke sessionStorage (atau localStorage)
+        // Buat id unik (timestamp + random)
+        const tempId = 'faktur_temp_' + Date.now() + '_' + Math.floor(Math.random()*10000);
+        const fakturData = {
+            id: tempId,
+            tanggal_faktur,
+            jenis_id_pembeli,
+            npwp_nik_pembeli,
+            nama_pembeli,
+            alamat_pembeli,
+            email_pembeli,
+            referensi
+        };
+        sessionStorage.setItem(tempId, JSON.stringify(fakturData));
+
+        // Render baris data biasa (dengan tombol Isi, passing tempId)
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td></td>
+            <td class="auto-number"></td>
+            <td>${tanggal_faktur.split('-').reverse().join('-')}</td>
+            <td>${jenis_id_pembeli} ${npwp_nik_pembeli}</td>
+            <td>${nama_pembeli}</td>
+            <td>${alamat_pembeli}</td>
+            <td>${email_pembeli}</td>
+            <td>${referensi}</td>
+            <td>
+                <div class="btn-group">
+                    <a href="{{ route('laporan_faktur.create') }}?temp_id=${tempId}" class="btn btn-warning btn-sm" title="Isi / Lengkapi Data">
+                        <i class="fas fa-edit"></i> Isi
+                    </a>
+                </div>
+            </td>
+        `;
+        row.parentNode.replaceChild(newRow, row);
+        updateAutoNumbers();
+    }
+});
 </script>
 @endpush 

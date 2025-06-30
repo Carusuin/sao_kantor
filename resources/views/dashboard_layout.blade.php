@@ -219,7 +219,7 @@
         }
     </style>
 
-    @stack('styles')
+    @stack('head')
 </head>
 
 <body>
