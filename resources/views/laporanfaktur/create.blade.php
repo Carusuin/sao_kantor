@@ -514,6 +514,15 @@ $(document).ready(function() {
     
     // Initial calculation when page loads (useful if initial data is present)
     updateTotals();
+
+    // Hapus draft dari sessionStorage setelah submit jika temp_id ada
+    $('#createEFakturForm').on('submit', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tempId = urlParams.get('temp_id');
+        if (tempId) {
+            sessionStorage.removeItem(tempId);
+        }
+    });
 });
 </script>
 @endpush
