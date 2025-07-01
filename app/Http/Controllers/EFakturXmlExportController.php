@@ -151,4 +151,28 @@ class EFakturXmlExportController extends Controller
             ]);
         }
     }
+    
+    /**
+     * Export multiple e-faktur records to single XML
+     */
+    public function exportMultiple(Request $request)
+    {
+        $ids = json_decode($request->input('selected_ids'), true);
+        if (!is_array($ids) || empty($ids)) {
+            return redirect()->back()->with('error', 'Tidak ada transaksi yang dipilih untuk diexport.');
+        }
+        $fakturs = Faktur::with('details')->whereIn('id', $ids)->get();
+        if ($fakturs->isEmpty()) {
+            return redirect()->back()->with('error', 'Data faktur tidak ditemukan.');
+        }
+        $xmlContent = $this->xmlExportService->exportToXml($fakturs);
+        $filename = $this->xmlExportService->generateFilename();
+        return response($xmlContent, 200, [
+            'Content-Type' => 'application/xml',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0'
+        ]);
+    }
 } 

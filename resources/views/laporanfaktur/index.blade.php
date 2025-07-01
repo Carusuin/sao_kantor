@@ -24,10 +24,14 @@
                             <i class="fas fa-plus me-1"></i>
                             Tambah Laporan E-Faktur
                         </a>
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exportModal">
-                            <i class="fas fa-file-export me-1"></i>
-                            Export XML
-                        </button>
+                        <form id="exportSelectedForm" action="{{ route('efaktur.export.multiple') }}" method="POST" style="display:inline;">
+                            @csrf
+                            <input type="hidden" name="selected_ids" id="selectedIdsInput">
+                            <button type="button" class="btn btn-success" id="exportSelectedBtn">
+                                <i class="fas fa-file-export me-1"></i>
+                                Export XML
+                            </button>
+                        </form>
                     </div>
                 </div>
                 
@@ -434,6 +438,17 @@ document.getElementById('fakturTableBody').addEventListener('click', function(e)
         row.parentNode.replaceChild(newRow, row);
         updateAutoNumbers();
     }
+});
+
+document.getElementById('exportSelectedBtn').addEventListener('click', function() {
+    const checked = document.querySelectorAll('.rowCheckbox:checked');
+    if (checked.length === 0) {
+        alert('Pilih minimal satu transaksi yang ingin diexport!');
+        return;
+    }
+    const ids = Array.from(checked).map(cb => cb.value);
+    document.getElementById('selectedIdsInput').value = JSON.stringify(ids);
+    document.getElementById('exportSelectedForm').submit();
 });
 </script>
 @endpush 

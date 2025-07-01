@@ -73,5 +73,6 @@ Route::middleware('auth')->group(function () {
         Route::get('single/{faktur}', [EFakturXmlExportController::class, 'exportSingle'])->name('single');
         Route::post('date-range', [EFakturXmlExportController::class, 'exportByDateRange'])->name('date-range');
         Route::post('preview', [EFakturXmlExportController::class, 'preview'])->name('preview');
+        Route::post('multiple', [EFakturXmlExportController::class, 'exportMultiple'])->name('multiple');
     });
 });
